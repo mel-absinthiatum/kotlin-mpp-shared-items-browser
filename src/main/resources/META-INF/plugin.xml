@@ -1,0 +1,29 @@
+<idea-plugin>
+    <id>melabsinthiatum.kotlin-mpp-shared-items-browser</id>
+    <name>Kotlin MPP shared items browser</name>
+    <vendor email="mel.absinthiatum@gmail.com">MelAbsinthiatum</vendor>
+
+    <description>The Intellij IDEA plugin displaying an expect-actual elements tree with navigation to these items in code by click.</description>
+
+    <depends>org.jetbrains.kotlin</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.platform</depends>
+
+
+    <extensions defaultExtensionNs="com.intellij">
+
+
+
+        <toolWindow id="Expect-Actual Interface" secondary="false" icon="/com/melabsinthiatum/shared_items_icon.svg" anchor="right"
+                    factoryClass="com.melabsinthiatum.view.toolWindow.MppToolWindowFactory" order="last"/>
+
+        <postStartupActivity implementation="com.melabsinthiatum.extensionPoints.CustomStartupActivity"/>
+
+    </extensions>
+
+    <actions>
+        <action id="RefreshTree" class="com.melabsinthiatum.actions.RefreshTreeAction"/>
+    </actions>
+
+
+</idea-plugin>
