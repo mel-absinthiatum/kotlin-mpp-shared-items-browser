@@ -2,12 +2,10 @@ package com.melabsinthiatum.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.melabsinthiatum.sharedElementsTree.tree.UpdateManager
+import com.melabsinthiatum.sharedElementsTree.settings.SharedElementsTreeSettingsViewWrapper
 
-
-class RefreshTreeAction : AnAction() {
+class TreeSettingsAction: AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
-        val project = e.project ?: return
-        UpdateManager(project).update()
+        SharedElementsTreeSettingsViewWrapper().showAndGet()
     }
 }

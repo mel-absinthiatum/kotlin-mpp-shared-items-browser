@@ -1,4 +1,4 @@
-package com.melabsinthiatum.view
+package com.melabsinthiatum.sharedElementsTree
 
 
 import com.intellij.ui.JBDefaultTreeCellRenderer

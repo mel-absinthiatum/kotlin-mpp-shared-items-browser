@@ -1,4 +1,4 @@
-package com.melabsinthiatum.imageManager
+package com.melabsinthiatum.services.imageManager
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.util.IconLoader
@@ -30,6 +30,7 @@ class CustomIcons {
     class Actions {
         companion object {
             val Refresh = AllIcons.Actions.Refresh
+            val Settings = AllIcons.General.Settings
         }
     }
 }

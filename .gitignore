@@ -48,6 +48,8 @@ hs_err_pid*
 !/gradle/wrapper/gradle-wrapper.jar*.war
 .idea/**/gradle.xml
 .idea/**/libraries
+.gradle
+/build/
 
 # Gradle and Maven with auto-import
 .idea/artifacts
@@ -70,3 +72,7 @@ out/
 
 # JIRA plugin
 atlassian-ide-plugin.xml
+
+# MacOS
+*.DS_Store
+.DS_Store

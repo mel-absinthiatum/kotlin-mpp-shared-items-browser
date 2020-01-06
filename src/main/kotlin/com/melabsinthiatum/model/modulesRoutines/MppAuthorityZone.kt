@@ -1,4 +1,4 @@
-package com.melabsinthiatum.modulesRoutines
+package com.melabsinthiatum.model.modulesRoutines
 
 import com.intellij.openapi.module.Module
 

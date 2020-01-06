@@ -1,26 +1,17 @@
-package com.melabsinthiatum.tree
+package com.melabsinthiatum.sharedElementsTree.tree
 
 import com.intellij.openapi.project.DumbServiceImpl
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiManager
-import com.intellij.psi.stubs.StubIndex
+import com.intellij.psi.*
 import com.melabsinthiatum.model.DeclarationType
 import com.melabsinthiatum.model.SharedType
+import com.melabsinthiatum.model.modulesRoutines.MppAuthorityManager
+import com.melabsinthiatum.model.modulesRoutines.MppAuthorityZone
 import com.melabsinthiatum.model.nodes.*
-import com.melabsinthiatum.model.nodes.model.ExpectOrActualModel
-import com.melabsinthiatum.model.nodes.model.FileNodeModel
-import com.melabsinthiatum.model.nodes.model.MppAuthorityZoneModel
-import com.melabsinthiatum.model.nodes.model.SharedElementModel
-import com.melabsinthiatum.modulesRoutines.MppAuthorityManager
-import com.melabsinthiatum.modulesRoutines.MppAuthorityZone
+import com.melabsinthiatum.model.nodes.model.*
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.kotlin.idea.stubindex.KotlinFullClassNameIndex
-import org.jetbrains.kotlin.idea.util.actualsForExpected
-import org.jetbrains.kotlin.idea.util.isExpectDeclaration
-import org.jetbrains.kotlin.idea.util.sourceRoots
+import org.jetbrains.kotlin.idea.util.*
 import org.jetbrains.kotlin.psi.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -97,12 +88,6 @@ class SharedTreeProvider {
                 null
             }
         }
-    }
-
-    private fun indexes(project: Project) {
-        val key = KotlinFullClassNameIndex.getInstance().key
-        val valNames = StubIndex.getInstance().getAllKeys(key, project)
-        valNames.forEach { println("index $it") }
     }
 
     private fun registerDeclaration(element: PsiElement): List<SharedElementNode> {

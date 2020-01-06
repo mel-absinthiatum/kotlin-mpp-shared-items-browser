@@ -1,7 +1,8 @@
-package com.melabsinthiatum.view.toolWindow
+package com.melabsinthiatum.sharedElementsTree.toolWindow
 
 import com.intellij.codeInsight.highlighting.HighlightManager
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.colors.EditorColors
@@ -10,86 +11,76 @@ import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.editor.event.EditorMouseListener
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.project.ProjectManagerListener
+import com.intellij.openapi.project.*
 import com.intellij.openapi.wm.ToolWindow
-import com.intellij.openapi.wm.ex.WindowManagerEx
 import com.intellij.ui.AnActionButton
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.treeStructure.Tree
-import com.intellij.util.messages.MessageBus
-import com.melabsinthiatum.extensionPoints.SharedElementsTopics
-import com.melabsinthiatum.extensionPoints.SharedElementsTopicsNotifier
-import com.melabsinthiatum.imageManager.CustomIcons
-import com.melabsinthiatum.model.nodes.CustomNodeInterface
-import com.melabsinthiatum.model.nodes.ExpectOrActualNode
-import com.melabsinthiatum.model.nodes.RootNode
-import com.melabsinthiatum.model.nodes.TemplateNodeInterface
-import com.melabsinthiatum.tree.UpdateManager
-import com.melabsinthiatum.tree.diff.Insert
-import com.melabsinthiatum.tree.diff.Remove
-import com.melabsinthiatum.tree.diff.TreeMutation
-import com.melabsinthiatum.tree.diff.TreesDiffManager
-import com.melabsinthiatum.view.MppSharedItemsTreeCellRenderer
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.intellij.util.messages.MessageBusConnection
+import com.melabsinthiatum.model.nodes.*
+import com.melabsinthiatum.services.extensionPoints.*
+import com.melabsinthiatum.services.imageManager.CustomIcons
+import com.melabsinthiatum.services.logging.Loggable
+import com.melabsinthiatum.services.logging.logger
+import com.melabsinthiatum.services.persistence.TreeSettingsComponent
+import com.melabsinthiatum.sharedElementsTree.MppSharedItemsTreeCellRenderer
+import com.melabsinthiatum.sharedElementsTree.tree.UpdateManager
+import com.melabsinthiatum.sharedElementsTree.tree.diff.*
+import kotlinx.coroutines.*
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import java.util.*
-import javax.swing.JPanel
-import javax.swing.JTree
-import javax.swing.SwingUtilities
-import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.DefaultTreeModel
-import javax.swing.tree.TreePath
-import javax.swing.tree.TreeSelectionModel
+import javax.swing.*
+import javax.swing.tree.*
 
 
-class MppToolWindow(private val project: Project, private val toolWindow: ToolWindow) {
+class MppToolWindow(private val project: Project, private val toolWindow: ToolWindow): Loggable {
 
     var content: JPanel
 
+    private val logger = logger()
     private val sharedElementsTree: Tree
     private val treeModel: DefaultTreeModel
     private var treeRoot: RootNode = RootNode()
     private val updateManager = UpdateManager(project)
     private var updateJob: Job? = null
-    private val updateInterval: Long = 5 * 1000
+    private var updateInterval: Long
     private var msgBus = project.messageBus.connect(project)
 
     init {
+        logger.info("Tool window is created.")
         treeModel = DefaultTreeModel(treeRoot)
         sharedElementsTree = Tree(treeModel)
-
+        configureSharedElementsTree()
         val decorator = decorator(sharedElementsTree)
         val panel = decorator.createPanel()
         content = panel
 
-        subscribe(project.messageBus)
+        subscribe(msgBus)
 
-        configureSharedElementsTree()
-
-        WindowManagerEx.getInstanceEx().getFocusedComponent(project)
-        updateJob = startCoroutineTimer(repeatMillis = updateInterval) { runUpdate() }
-
-        msgBus.subscribe(ProjectManager.TOPIC, object : ProjectManagerListener {
-            override fun projectClosingBeforeSave(project: Project) {
-                updateJob?.cancel()
-            }
-        })
+        val service = ServiceManager.getService(TreeSettingsComponent::class.java)
+        updateInterval = service?.state?.reloadInterval ?: 10
+        updateJob = runRepeatingUpdates(repeatMillis = updateInterval * 1000)
     }
 
     private fun decorator(tree: Tree): ToolbarDecorator {
-        val refreshActionButton = AnActionButton.fromAction(ActionManager.getInstance().getAction("RefreshTree"))
+        val refreshActionButton = AnActionButton.fromAction(
+            ActionManager.getInstance()
+                .getAction("com.melabsinthiatum.actions.RefreshTreeAction")
+        )
         refreshActionButton.templatePresentation.icon = CustomIcons.Actions.Refresh
+
+        val treeSettingsButton = AnActionButton.fromAction(
+            ActionManager.getInstance()
+                .getAction("com.melabsinthiatum.actions.TreeSettingsAction")
+        )
+        treeSettingsButton.templatePresentation.icon = CustomIcons.Actions.Settings
 
         return ToolbarDecorator.createDecorator(tree)
             .initPosition()
             .disableAddAction().disableRemoveAction().disableDownAction().disableUpAction()
-            .addExtraAction(refreshActionButton)
+            .addExtraActions(refreshActionButton)
+            .addExtraAction(treeSettingsButton)
     }
 
     private fun configureSharedElementsTree() {
@@ -112,19 +103,33 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
         }
     }
 
-    private fun subscribe(bus: MessageBus) {
-        bus.connect().subscribe(SharedElementsTopics.SHARED_ELEMENTS_TREE_TOPIC, object : SharedElementsTopicsNotifier {
+    private fun subscribe(bus: MessageBusConnection) {
+        bus.subscribe(ProjectManager.TOPIC, object : ProjectManagerListener {
+            override fun projectClosingBeforeSave(project: Project) {
+                updateJob?.cancel()
+            }
+        })
+
+        bus.subscribe(SharedElementsTopics.SHARED_ELEMENTS_TREE_TOPIC, object : SharedElementsTopicsNotifier {
             override fun sharedElementsUpdated(root: RootNode) {
                 val diffTree = TreesDiffManager().makeMutationsTree(treeRoot, root) ?: return
                 updateTree(treeRoot, diffTree)
             }
         })
+
+        bus.subscribe(
+            SharedElementsTopics.SHARED_ELEMENTS_TREE_SETTINGS_TOPIC,
+            object : SharedElementsTreeSettingsNotifier {
+                override fun reloadIntervalUpdated(oldValue: Long, newValue: Long) {
+                    updateJob?.cancel()
+                    updateJob = runRepeatingUpdates(repeatMillis = newValue * 1000)
+                }
+            })
     }
 
     private fun updateTree(sourceNode: CustomNodeInterface, diffNode: DefaultMutableTreeNode) {
         val diffNodeModel = diffNode.userObject as? TreesDiffManager.DiffNodeModel<*> ?: return
         if (sourceNode.nodeModel() != diffNodeModel.sourceNodeModel) {
-            println("sourceNodeModel type cast error")
             return
         }
 
@@ -165,6 +170,11 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
         for (path in expanded) {
             sharedElementsTree.expandPath(path)
         }
+    }
+
+    private fun runRepeatingUpdates(delayMillis: Long = 0, repeatMillis: Long = 0): Job {
+        logger.debug("Run repeating updates $repeatMillis.")
+        return startCoroutineTimer(delayMillis, repeatMillis) { runUpdate() }
     }
 
     private fun runUpdate() {
@@ -213,7 +223,7 @@ private fun startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long = 0, a
     GlobalScope.launch {
         delay(delayMillis)
         if (repeatMillis > 0) {
-            while (true) {
+            while (isActive) {
                 action()
                 delay(repeatMillis)
             }

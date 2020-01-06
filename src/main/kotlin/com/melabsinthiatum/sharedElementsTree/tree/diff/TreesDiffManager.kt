@@ -1,4 +1,4 @@
-package com.melabsinthiatum.tree.diff
+package com.melabsinthiatum.sharedElementsTree.tree.diff
 
 import com.melabsinthiatum.model.nodes.CustomNodeInterface
 import javax.swing.tree.DefaultMutableTreeNode

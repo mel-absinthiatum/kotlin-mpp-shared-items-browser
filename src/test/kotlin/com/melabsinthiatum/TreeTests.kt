@@ -1,9 +1,9 @@
 package com.melabsinthiatum
 
-import com.melabsinthiatum.imageManager.CustomIcons
 import com.melabsinthiatum.model.nodes.TemplateNode
 import com.melabsinthiatum.model.nodes.model.NodeModel
-import com.melabsinthiatum.tree.diff.TreesDiffManager
+import com.melabsinthiatum.services.imageManager.CustomIcons
+import com.melabsinthiatum.sharedElementsTree.tree.diff.TreesDiffManager
 import org.jetbrains.kotlin.utils.addToStdlib.assertedCast
 import javax.swing.Icon
 import javax.swing.tree.DefaultMutableTreeNode

@@ -1,8 +1,8 @@
 package com.melabsinthiatum.model.nodes.model
 
 import com.intellij.psi.stubs.Stub
-import com.melabsinthiatum.imageManager.CustomIcons
 import com.melabsinthiatum.model.DeclarationType
+import com.melabsinthiatum.services.imageManager.CustomIcons
 import javax.swing.Icon
 
 interface SharedElementModelInterface {

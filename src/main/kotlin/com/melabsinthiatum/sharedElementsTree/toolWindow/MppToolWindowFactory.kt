@@ -1,4 +1,4 @@
-package com.melabsinthiatum.view.toolWindow
+package com.melabsinthiatum.sharedElementsTree.toolWindow
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow

@@ -1,13 +1,13 @@
-package com.melabsinthiatum.tree
+package com.melabsinthiatum.sharedElementsTree.tree
 
 import com.intellij.openapi.project.Project
-import com.melabsinthiatum.extensionPoints.SharedElementsTopics
-import com.melabsinthiatum.extensionPoints.SharedElementsTopicsNotifier
+import com.melabsinthiatum.services.extensionPoints.SharedElementsTopics
+import com.melabsinthiatum.services.extensionPoints.SharedElementsTopicsNotifier
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
-class UpdateManager(val project: Project) {
+class UpdateManager(private val project: Project) {
     fun update() {
         GlobalScope.launch {
             val root = SharedTreeProvider().sharedTreeRoot(project)

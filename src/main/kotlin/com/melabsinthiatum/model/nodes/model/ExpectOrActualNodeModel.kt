@@ -2,8 +2,8 @@ package com.melabsinthiatum.model.nodes.model
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.Stub
-import com.melabsinthiatum.imageManager.CustomIcons
 import com.melabsinthiatum.model.SharedType
+import com.melabsinthiatum.services.imageManager.CustomIcons
 import org.jetbrains.kotlin.idea.util.module
 import javax.swing.Icon
 
