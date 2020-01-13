@@ -41,4 +41,4 @@ class PackageNode(model: FileNodeModel) : TemplateNode<FileNodeModel, SharedElem
 class MppAuthorityZoneNode(model: MppAuthorityZoneModel) :
     TemplateNode<MppAuthorityZoneModel, PackageNode>(model)
 
-class RootNode : TemplateRootNode<NodeModel, MppAuthorityZoneNode>(RootNodeModel)
+class RootNode(projectName: String) : TemplateRootNode<NodeModel, MppAuthorityZoneNode>(RootNodeModel(projectName))

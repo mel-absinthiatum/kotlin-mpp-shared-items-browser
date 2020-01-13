@@ -64,7 +64,7 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
     private val logger = logger()
     private val sharedElementsTree: Tree
     private val treeModel: DefaultTreeModel
-    private var treeRoot: RootNode = RootNode()
+    private var treeRoot: RootNode = RootNode(project.name)
     private val updateManager = UpdateManager(project)
     private var updateJob: Job? = null
     private var updateInterval: Long

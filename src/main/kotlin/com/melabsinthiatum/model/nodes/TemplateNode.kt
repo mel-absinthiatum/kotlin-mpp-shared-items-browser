@@ -47,14 +47,14 @@ interface TemplateNodeInterface<M: NodeModel, C: CustomNodeInterface> : CustomNo
 abstract class TemplateNode<M: NodeModel, C: CustomNodeInterface>(
     override var model: M,
     var nodeParent: CustomNodeInterface? = null,
-    val children: MutableList<C> = mutableListOf()
+    private val children: MutableList<C> = mutableListOf()
 ) : TemplateNodeInterface<M, C> {
 
     override fun nodeParent(): CustomNodeInterface? = nodeParent
 
     override fun childNodes(): List<C> = children
 
-    override fun nodeModel(): Any? = model
+    override fun nodeModel(): NodeModel? = model
 
     override fun add(node: C) {
         children.add(node)
@@ -124,7 +124,10 @@ abstract class TemplateNode<M: NodeModel, C: CustomNodeInterface>(
         this.add(nodes.asList())
         return this
     }
+
+
 }
+
 
 abstract class TemplateLeaf<M: NodeModel>(model: M): TemplateNode<M, Nothing>(model) {
     override fun getAllowsChildren(): Boolean = false
