@@ -23,7 +23,6 @@
 
 package com.melabsinthiatum.model.nodes.model
 
-import com.intellij.psi.stubs.Stub
 import com.melabsinthiatum.model.DeclarationType
 import com.melabsinthiatum.services.imageManager.CustomIcons
 import javax.swing.Icon
@@ -34,17 +33,14 @@ import javax.swing.Icon
  * with its AST declaration type info. Below this element in the tree is a set of leaf elements
  * suggesting the location of general and platform declarations of the element in the code.
  */
-// TODO remove stub
 interface SharedElementModelInterface {
     val name: String?
     val type: DeclarationType
-    val stub: Stub?
 }
 
 data class SharedElementModel(
     override val name: String?,
-    override val type: DeclarationType,
-    override val stub: Stub?
+    override val type: DeclarationType
 ) : SharedElementModelInterface, NodeModel {
 
     override fun getLabelText(): String {

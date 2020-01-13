@@ -124,7 +124,9 @@ class SharedTreeProvider {
     }
 
 
+    //
     // Handle shared declaration
+    //
 
     private fun registerGlobalLevelDeclaration(element: PsiElement): List<SharedElementNode> {
         val list = mutableListOf<SharedElementNode>()
@@ -182,7 +184,7 @@ class SharedTreeProvider {
             assert(false) { "Empty element name." }
             return null
         }
-        val model = ExpectOrActualModel(element.name!!, element, SharedType.EXPECTED, null)
+        val model = ExpectOrActualModel(element.name!!, element, SharedType.EXPECTED)
         return ExpectOrActualNode(model)
     }
 
@@ -193,7 +195,7 @@ class SharedTreeProvider {
                 assert(false) { "Empty element name." }
                 null
             } else {
-                val model = ExpectOrActualModel(it.name!!, it, SharedType.ACTUAL, null)
+                val model = ExpectOrActualModel(it.name!!, it, SharedType.ACTUAL)
                 ExpectOrActualNode(model)
             }
         }
@@ -205,29 +207,22 @@ class SharedTreeProvider {
     //
 
     private fun registerAnnotation(annotationClass: KtClass): SharedElementNode {
-        val stub = annotationClass.stub
-        val model =
-            SharedElementModel(annotationClass.name, DeclarationType.ANNOTATION, stub)
+        val model = SharedElementModel(annotationClass.name, DeclarationType.ANNOTATION)
         return SharedElementNode(model)
     }
 
     private fun registerProperty(property: KtProperty): SharedElementNode {
-        val stub = property.stub
-        val model = SharedElementModel(property.name, DeclarationType.PROPERTY, stub)
+        val model = SharedElementModel(property.name, DeclarationType.PROPERTY)
         return SharedElementNode(model)
     }
 
     private fun registerNamedFunction(function: KtNamedFunction): SharedElementNode {
-        val stub = function.stub
-
-        val model = SharedElementModel(function.name, DeclarationType.NAMED_FUNCTION, stub)
+        val model = SharedElementModel(function.name, DeclarationType.NAMED_FUNCTION)
         return SharedElementNode(model)
     }
 
     private fun registerClass(classDeclaration: KtClass): SharedElementNode {
-        val stub = classDeclaration.stub
-
-        val model = SharedElementModel(classDeclaration.name, DeclarationType.CLASS, stub)
+        val model = SharedElementModel(classDeclaration.name, DeclarationType.CLASS)
 
         val node = SharedElementNode(model)
 
@@ -241,12 +236,8 @@ class SharedTreeProvider {
         return node
     }
 
-    private fun registerObject(
-        objectDeclaration: KtObjectDeclaration
-    ): SharedElementNode {
-        val stub = objectDeclaration.stub
-
-        val model = SharedElementModel(objectDeclaration.name, DeclarationType.OBJECT, stub)
+    private fun registerObject(objectDeclaration: KtObjectDeclaration): SharedElementNode {
+        val model = SharedElementModel(objectDeclaration.name, DeclarationType.OBJECT)
 
         val node = SharedElementNode(model)
 

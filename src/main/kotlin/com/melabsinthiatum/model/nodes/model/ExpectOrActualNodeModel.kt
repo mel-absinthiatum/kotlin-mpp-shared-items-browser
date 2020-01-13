@@ -24,7 +24,6 @@
 package com.melabsinthiatum.model.nodes.model
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.Stub
 import com.melabsinthiatum.model.SharedType
 import com.melabsinthiatum.services.imageManager.CustomIcons
 import org.jetbrains.kotlin.idea.util.module
@@ -36,19 +35,16 @@ import javax.swing.Icon
  * This object provides the psi- and document-level info for a specific element
  * on a specific platform or common module, what is suggested in the <code>SharedType</code> field.
  */
-//TODO Remove stubs
 interface ExpectOrActualModelInterface : NodeModel {
     val name: String
     val psi: PsiElement
     val type: SharedType
-    val stub: Stub?
 }
 
 data class ExpectOrActualModel(
     override val name: String,
     override val psi: PsiElement,
-    override val type: SharedType,
-    override val stub: Stub?
+    override val type: SharedType
 ) : ExpectOrActualModelInterface {
     override fun getLabelText(): String = when (type) {
         SharedType.EXPECTED -> psi.module?.name ?: "Common"

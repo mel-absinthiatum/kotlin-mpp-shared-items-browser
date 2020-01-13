@@ -32,6 +32,8 @@ import org.junit.Test as test
 
 class TreeTests {
 
+    private val diffManager = TreeDiffManager
+
     @test
     fun `Test default root node mutations`() {
         val sourceTreeRoot = DefaultMutableTreeNode("1").including(
@@ -46,7 +48,7 @@ class TreeTests {
             DefaultMutableTreeNode("1-4")
         )
 
-        val mutationsTree = TreeDiffManager().makeMutationsTree(sourceTreeRoot, resultTreeRoot)
+        val mutationsTree = diffManager.makeMutationsTree(sourceTreeRoot, resultTreeRoot)
 
         assertNotNull(mutationsTree, "Mutations tree must be non null")
 
@@ -83,7 +85,7 @@ class TreeTests {
             DefaultMutableTreeNode("1-3")
         )
 
-        val mutationsTree = TreeDiffManager().makeMutationsTree(sourceTreeRoot, resultTreeRoot)
+        val mutationsTree = diffManager.makeMutationsTree(sourceTreeRoot, resultTreeRoot)
 
         assertNotNull(mutationsTree, "Mutations tree must be non null")
 

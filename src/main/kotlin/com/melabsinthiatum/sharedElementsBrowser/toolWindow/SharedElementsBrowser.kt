@@ -23,16 +23,8 @@
 
 package com.melabsinthiatum.sharedElementsBrowser.toolWindow
 
-import com.intellij.codeInsight.highlighting.HighlightManager
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.ScrollType
-import com.intellij.openapi.editor.colors.EditorColors
-import com.intellij.openapi.editor.colors.EditorColorsManager
-import com.intellij.openapi.editor.event.EditorMouseEvent
-import com.intellij.openapi.editor.event.EditorMouseListener
-import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.*
 import com.intellij.openapi.wm.ToolWindow
@@ -41,21 +33,20 @@ import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.messages.MessageBusConnection
 import com.melabsinthiatum.model.nodes.RootNode
-import com.melabsinthiatum.model.nodes.model.*
+import com.melabsinthiatum.model.nodes.model.NodeModel
+import com.melabsinthiatum.model.nodes.model.RootNodeModel
 import com.melabsinthiatum.model.nodes.toDefaultTree
 import com.melabsinthiatum.services.extensionPoints.*
 import com.melabsinthiatum.services.imageManager.CustomIcons
 import com.melabsinthiatum.services.logging.Loggable
 import com.melabsinthiatum.services.logging.logger
 import com.melabsinthiatum.services.persistence.TreeSettingsComponent
-import com.melabsinthiatum.sharedElementsBrowser.MppSharedItemsTreeCellRenderer
-import com.melabsinthiatum.sharedElementsBrowser.tree.SharedElementsUpdateManager
+import com.melabsinthiatum.sharedElementsBrowser.tree.*
 import com.melabsinthiatum.sharedElementsBrowser.tree.diff.*
 import kotlinx.coroutines.*
-import org.jetbrains.kotlin.psi.psiUtil.endOffset
-import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import java.util.*
-import javax.swing.*
+import javax.swing.JPanel
+import javax.swing.SwingUtilities
 import javax.swing.tree.*
 
 
@@ -65,6 +56,8 @@ import javax.swing.tree.*
  * as settings and update buttons.
  *
  * Also, the browser can perform updates by a predefined in the settings time interval.
+ *
+ * The tree updates only if the tool window is visible and any editor is focused.
 */
 class SharedElementsBrowser(private val project: Project, private val toolWindow: ToolWindow) : Loggable {
 
@@ -75,6 +68,7 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
     private var treeRoot: DefaultMutableTreeNode = DefaultMutableTreeNode(RootNodeModel(project.name))
     private val treeModel: DefaultTreeModel
     private val updateManager = SharedElementsUpdateManager
+    private val diffManager = TreeDiffManager
     private var updateJob: Job? = null
     private var updateInterval: Long
     private var msgBus = project.messageBus.connect(project)
@@ -126,21 +120,8 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
         sharedElementsTree.run {
             isRootVisible = false
             selectionModel.selectionMode = TreeSelectionModel.SINGLE_TREE_SELECTION
-            cellRenderer = MppSharedItemsTreeCellRenderer(sharedElementsTree)
-            // TODO: move TreeSelectionListener to another file
-            addTreeSelectionListener { event ->
-                val source = event.source as JTree
-                val node = source.lastSelectedPathComponent as? DefaultMutableTreeNode
-                val nodeModel = node?.userObject as? ExpectOrActualModelInterface
-                source.clearSelection()
-                val psi = nodeModel?.psi
-                val file = psi?.containingFile?.virtualFile
-                if (psi != null && file != null && file.isValid && !file.isDirectory) {
-                    val fileEditorManager = FileEditorManager.getInstance(project)
-                    fileEditorManager.openFile(file, true)
-                    fileEditorManager.selectedTextEditor?.highlightOnce(psi.startOffset, psi.endOffset)
-                }
-            }
+            cellRenderer = SharedElementsTreeCellRenderer(sharedElementsTree)
+            addTreeSelectionListener(SharedElementsSelectionListener(project))
         }
     }
 
@@ -154,8 +135,7 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
         bus.subscribe(SharedElementsTopics.SHARED_ELEMENTS_TREE_TOPIC, object : SharedElementsTopicsNotifier {
             override fun sharedElementsUpdated(root: RootNode) {
                 val defaultRoot = root.toDefaultTree()
-                val diffTree =
-                    TreeDiffManager().makeMutationsTree(oldNode = treeRoot, newNode = defaultRoot)
+                val diffTree = diffManager.makeMutationsTree(oldNode = treeRoot, newNode = defaultRoot)
                 if (diffTree != null) {
                     updateTree(treeRoot, diffTree)
                 }
@@ -261,32 +241,3 @@ private fun startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long = 0, a
             action()
         }
     }
-
-
-private fun Editor.highlightOnce(startOffset: Int, endOffset: Int) {
-    val attributes = EditorColorsManager.getInstance().globalScheme.getAttributes(
-        EditorColors.SEARCH_RESULT_ATTRIBUTES
-    )
-
-    val outHighlighters = mutableListOf<RangeHighlighter>()
-    HighlightManager.getInstance(project).addOccurrenceHighlight(
-        this,
-        startOffset,
-        endOffset,
-        attributes,
-        HighlightManager.HIDE_BY_ANY_KEY,
-        outHighlighters,
-        null
-    )
-    this.addEditorMouseListener(object : EditorMouseListener {
-        override fun mouseReleased(event: EditorMouseEvent) {
-            outHighlighters.forEach { it.dispose() }
-        }
-    })
-
-    val caretModel = this.caretModel
-    caretModel.primaryCaret.moveToOffset(startOffset)
-    val scrollingModel = this.scrollingModel
-
-    scrollingModel.scrollToCaret(ScrollType.CENTER_UP)
-}

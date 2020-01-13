@@ -21,7 +21,7 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsBrowser
+package com.melabsinthiatum.sharedElementsBrowser.tree
 
 import com.intellij.ui.JBDefaultTreeCellRenderer
 import com.intellij.ui.components.JBLabel
@@ -32,7 +32,7 @@ import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 
 
-class MppSharedItemsTreeCellRenderer(tree: JTree) : JBDefaultTreeCellRenderer(tree) {
+class SharedElementsTreeCellRenderer(tree: JTree) : JBDefaultTreeCellRenderer(tree) {
 
     override fun getTreeCellRendererComponent(tree: JTree?, value: Any?, sel: Boolean, expanded: Boolean,
                                               leaf: Boolean, row: Int, hasFocus: Boolean): Component {

@@ -7,8 +7,7 @@ import javax.swing.tree.DefaultMutableTreeNode
  * <code>TreeDiffManager</code> provides a hierarchical object (diff-tree) representing
  * a set of editorial operations necessary for converting the source tree to the target tree.
  */
-//TODO change to object
-class TreeDiffManager {
+object TreeDiffManager {
 
     /**
      * The tuple of two comparing nodes.
