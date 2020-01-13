@@ -27,79 +27,38 @@ import com.melabsinthiatum.model.nodes.model.NodeModel
 import com.melabsinthiatum.model.nodes.utils.emptyEnumeration
 import com.melabsinthiatum.model.nodes.utils.toEnumeration
 import java.util.*
-import javax.swing.tree.MutableTreeNode
 import javax.swing.tree.TreeNode
 
 
-interface TemplateNodeInterface<M: NodeModel, C: CustomNodeInterface> : CustomNodeInterface {
+interface TemplateNodeInterface<M : NodeModel, C : CustomNodeInterface> : CustomNodeInterface {
     var model: M
 
     fun add(node: C)
 
     fun add(nodes: List<C>)
-
-    fun remove(node: C)
-
-    fun remove(nodes: List<C>)
 }
 
 
-abstract class TemplateNode<M: NodeModel, C: CustomNodeInterface>(
+abstract class TemplateNode<M : NodeModel, C : CustomNodeInterface>(
     override var model: M,
-    var nodeParent: CustomNodeInterface? = null,
+    override var nodeParent: CustomNodeInterface? = null,
     private val children: MutableList<C> = mutableListOf()
 ) : TemplateNodeInterface<M, C> {
-
-    override fun nodeParent(): CustomNodeInterface? = nodeParent
 
     override fun childNodes(): List<C> = children
 
     override fun nodeModel(): NodeModel? = model
 
     override fun add(node: C) {
+        check(allowsChildren) { "node does not allow children" }
+        require(!isNodeAncestor(node)) { "new child is an ancestor" }
+
+        node.nodeParent = this
         children.add(node)
     }
 
     override fun add(nodes: List<C>) {
-        children.addAll(nodes)
-    }
-
-    override fun remove(node: C) {
-        node.removeNodeParent()
-        children.removeIf { it == node }
-    }
-
-    override fun remove(nodes: List<C>) {
-        nodes.forEach { it.removeNodeParent() }
-        children.removeAll(nodes)
-    }
-
-    override fun remove(index: Int) {
-        children.removeAt(index)
-    }
-
-    override fun remove(node: MutableTreeNode?) {
-        children.removeIf { it == node }
-    }
-
-    override fun insert(child: MutableTreeNode, index: Int) {
-        val newNode = child as? C ?: throw Exception("wrong type")
-        children.add(index, newNode)
-    }
-
-    override fun setParent(newParent: MutableTreeNode) {
-        val newParentNode = newParent as? CustomNodeInterface ?: throw Exception("wrong type")
-        nodeParent = newParentNode
-    }
-
-    override fun setUserObject(`object`: Any) {
-        val newModel = `object` as? M ?: throw Exception("wrong type")
-        model = newModel
-    }
-
-    override fun removeFromParent() {
-        nodeParent?.remove(this)
-        nodeParent = null
+        nodes.forEach { add(it) }
     }
 
     override fun children(): Enumeration<out TreeNode> = children.toEnumeration()
@@ -125,11 +84,23 @@ abstract class TemplateNode<M: NodeModel, C: CustomNodeInterface>(
         return this
     }
 
-
+    private fun isNodeAncestor(anotherNode: TreeNode?): Boolean {
+        if (anotherNode == null) {
+            return false
+        }
+        var ancestor: TreeNode? = this
+        do {
+            if (ancestor === anotherNode) {
+                return true
+            }
+            ancestor = ancestor?.parent
+        } while (ancestor?.parent != null)
+        return false
+    }
 }
 
 
-abstract class TemplateLeaf<M: NodeModel>(model: M): TemplateNode<M, Nothing>(model) {
+abstract class TemplateLeaf<M : NodeModel>(model: M) : TemplateNode<M, Nothing>(model) {
     override fun getAllowsChildren(): Boolean = false
 
     override fun add(node: Nothing) {
@@ -137,10 +108,6 @@ abstract class TemplateLeaf<M: NodeModel>(model: M): TemplateNode<M, Nothing>(mo
     }
 
     override fun add(nodes: List<Nothing>) {
-        assert(false) { "Not allowed." }
-    }
-
-    override fun remove(node: Nothing) {
         assert(false) { "Not allowed." }
     }
 
@@ -161,10 +128,15 @@ abstract class TemplateLeaf<M: NodeModel>(model: M): TemplateNode<M, Nothing>(mo
     }
 }
 
-abstract class TemplateRootNode<M: NodeModel, C: CustomNodeInterface>(
+abstract class TemplateRootNode<M : NodeModel, C : CustomNodeInterface>(
     model: M
 ) : TemplateNode<M, C>(model) {
-    override fun nodeParent(): CustomNodeInterface? = null
+    @Suppress("UNUSED_PARAMETER")
+    override var nodeParent: CustomNodeInterface?
+        get() = null
+        set(value) {
+            assert(false) { "Not allowed." }
+        }
 
     override fun getParent(): TreeNode? = null
 

@@ -24,29 +24,26 @@
 package com.melabsinthiatum.model.nodes
 
 import com.melabsinthiatum.model.nodes.model.NodeModel
-import java.lang.reflect.Type
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.MutableTreeNode
+import javax.swing.tree.TreeNode
 
-interface CustomNodeInterface: MutableTreeNode {
+interface CustomNodeInterface : TreeNode {
     fun removeNodeParent()
     fun nodeModel(): NodeModel?
     fun childNodes(): List<CustomNodeInterface>
-    fun nodeParent(): CustomNodeInterface?
-
-    fun toDefaultTree(): DefaultMutableTreeNode = this.toDefaultNode()
-
-    private fun toDefaultNode(): DefaultMutableTreeNode {
-        val universalModel = UniversalNodeModel(this::class.java, this.nodeModel())
-        val node = DefaultMutableTreeNode(universalModel)
-
-        val universalNodeChildren = this.childNodes().map { it.toDefaultNode() }
-        universalNodeChildren.reversed().forEach {
-            node.insert(it,  0)
-        }
-
-        return node
-    }
+    var nodeParent: CustomNodeInterface?
 }
 
-data class UniversalNodeModel(val nodeClass: Type, val model: NodeModel?)
+fun CustomNodeInterface.toDefaultTree(): DefaultMutableTreeNode = this.toDefaultNode()
+
+private fun CustomNodeInterface.toDefaultNode(): DefaultMutableTreeNode {
+    val node = DefaultMutableTreeNode(this.nodeModel())
+
+    val universalNodeChildren = this.childNodes().map { it.toDefaultNode() }
+    universalNodeChildren.reversed().forEach {
+        node.insert(it, 0)
+    }
+
+    return node
+}
+

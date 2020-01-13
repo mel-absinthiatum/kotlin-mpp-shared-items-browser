@@ -25,7 +25,7 @@ package com.melabsinthiatum.model.nodes.model
 
 import javax.swing.Icon
 
-class RootNodeModel(val projectName: String) : NodeModel {
+data class RootNodeModel(val projectName: String): NodeModel {
     override fun getLabelText(): String {
         return "project $projectName"
     }

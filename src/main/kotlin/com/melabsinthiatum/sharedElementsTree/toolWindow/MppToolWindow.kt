@@ -40,7 +40,9 @@ import com.intellij.ui.AnActionButton
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.messages.MessageBusConnection
-import com.melabsinthiatum.model.nodes.*
+import com.melabsinthiatum.model.nodes.RootNode
+import com.melabsinthiatum.model.nodes.model.*
+import com.melabsinthiatum.model.nodes.toDefaultTree
 import com.melabsinthiatum.services.extensionPoints.*
 import com.melabsinthiatum.services.imageManager.CustomIcons
 import com.melabsinthiatum.services.logging.Loggable
@@ -57,14 +59,14 @@ import javax.swing.*
 import javax.swing.tree.*
 
 
-class MppToolWindow(private val project: Project, private val toolWindow: ToolWindow): Loggable {
+class MppToolWindow(private val project: Project, private val toolWindow: ToolWindow) : Loggable {
 
     var content: JPanel
 
     private val logger = logger()
     private val sharedElementsTree: Tree
+    private var treeRoot: DefaultMutableTreeNode = DefaultMutableTreeNode(RootNodeModel(project.name))
     private val treeModel: DefaultTreeModel
-    private var treeRoot: RootNode = RootNode(project.name)
     private val updateManager = UpdateManager(project)
     private var updateJob: Job? = null
     private var updateInterval: Long
@@ -72,7 +74,9 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
 
     init {
         logger.info("Tool window is created.")
+
         treeModel = DefaultTreeModel(treeRoot)
+
         sharedElementsTree = Tree(treeModel)
         configureSharedElementsTree()
         val decorator = decorator(sharedElementsTree)
@@ -113,9 +117,10 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
             cellRenderer = MppSharedItemsTreeCellRenderer(sharedElementsTree)
             addTreeSelectionListener { event ->
                 val source = event.source as JTree
-                val node = source.lastSelectedPathComponent as? ExpectOrActualNode
+                val node = source.lastSelectedPathComponent as? DefaultMutableTreeNode
+                val nodeModel = node?.userObject as? ExpectOrActualModelInterface
                 source.clearSelection()
-                val psi = node?.model?.psi
+                val psi = nodeModel?.psi
                 val file = psi?.containingFile?.virtualFile
                 if (psi != null && file != null && file.isValid && !file.isDirectory) {
                     val fileEditorManager = FileEditorManager.getInstance(project)
@@ -135,8 +140,12 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
 
         bus.subscribe(SharedElementsTopics.SHARED_ELEMENTS_TREE_TOPIC, object : SharedElementsTopicsNotifier {
             override fun sharedElementsUpdated(root: RootNode) {
-                val diffTree = TreesDiffManager().makeMutationsTree(treeRoot, root) ?: return
-                updateTree(treeRoot, diffTree)
+                val defaultRoot = root.toDefaultTree()
+                val diffTree =
+                    TreeDiffManager().makeMutationsTree(oldNode = treeRoot, newNode = defaultRoot)
+                if (diffTree != null) {
+                    updateTree(treeRoot, diffTree)
+                }
             }
         })
 
@@ -150,35 +159,37 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
             })
     }
 
-    private fun updateTree(sourceNode: CustomNodeInterface, diffNode: DefaultMutableTreeNode) {
-        val diffNodeModel = diffNode.userObject as? TreesDiffManager.DiffNodeModel<*> ?: return
-        if (sourceNode.nodeModel() != diffNodeModel.sourceNodeModel) {
+    private fun updateTree(sourceNode: DefaultMutableTreeNode, diffNode: DefaultMutableTreeNode) {
+        val diffNodeModel = diffNode.userObject as? TreeDiffManager.DiffNodeModel<*> ?: return
+        val sourceNodeModel = sourceNode.userObject as? NodeModel ?: return
+
+        if (sourceNodeModel != diffNodeModel.sourceNodeModel) {
             return
         }
+        val sourceNodeChildren = sourceNode.children().toList().filterIsInstance<DefaultMutableTreeNode>()
 
         val mutatedChildren = diffNode.children().toList()
         mutatedChildren.forEach {
             val mutatedChildNode = it as? DefaultMutableTreeNode ?: return@forEach
-            val mutatedChildModel = mutatedChildNode.userObject as? TreesDiffManager.DiffNodeModel<*> ?: return@forEach
-            for (sourceChild in sourceNode.childNodes()) {
-                if (sourceChild.nodeModel() == mutatedChildModel.sourceNodeModel) {
+            val mutatedChildModel = mutatedChildNode.userObject as? TreeDiffManager.DiffNodeModel<*> ?: return@forEach
+            for (sourceChild in sourceNodeChildren) {
+
+                if (sourceChild.userObject == mutatedChildModel.sourceNodeModel) {
                     updateTree(sourceChild, mutatedChildNode)
                     break
                 }
             }
         }
-
         val mutations = diffNodeModel.mutations
         mutations.forEach { handleMutation(sourceNode, it) }
 
         reloadTree()
     }
 
-    private fun handleMutation(node: CustomNodeInterface, mutation: TreeMutation) {
-        val targetNode = node as? TemplateNodeInterface<*, *> ?: return
+    private fun handleMutation(node: DefaultMutableTreeNode, mutation: TreeMutation) {
         when (mutation) {
-            is Insert -> targetNode.insert(mutation.node, targetNode.childCount)
-            is Remove -> targetNode.remove(mutation.node)
+            is Insert -> node.add(mutation.node)
+            is Remove -> node.remove(mutation.node)
         }
     }
 

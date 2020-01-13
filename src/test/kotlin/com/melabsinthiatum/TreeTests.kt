@@ -23,12 +23,8 @@
 
 package com.melabsinthiatum
 
-import com.melabsinthiatum.model.nodes.TemplateNode
-import com.melabsinthiatum.model.nodes.model.NodeModel
-import com.melabsinthiatum.services.imageManager.CustomIcons
-import com.melabsinthiatum.sharedElementsTree.tree.diff.TreesDiffManager
+import com.melabsinthiatum.sharedElementsTree.tree.diff.TreeDiffManager
 import org.jetbrains.kotlin.utils.addToStdlib.assertedCast
-import javax.swing.Icon
 import javax.swing.tree.DefaultMutableTreeNode
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -36,33 +32,25 @@ import org.junit.Test as test
 
 class TreeTests {
 
-    data class TestNodeModel(val title: String): NodeModel {
-        override fun getLabelText(): String = title
-        override fun getIcon(): Icon? = CustomIcons.Nodes.File
-    }
-
-    class TestNode(title: String): TemplateNode<TestNodeModel, TestNode>(
-        TestNodeModel(title)
-    )
-
-    @test fun `Test root node mutations`() {
-        val sourceTreeRoot = TestNode("1").including(
-            TestNode("1-1"),
-            TestNode("1-2"),
-            TestNode("1-3")
+    @test
+    fun `Test default root node mutations`() {
+        val sourceTreeRoot = DefaultMutableTreeNode("1").including(
+            DefaultMutableTreeNode("1-1"),
+            DefaultMutableTreeNode("1-2"),
+            DefaultMutableTreeNode("1-3")
         )
 
-        val resultTreeRoot = TestNode("1").including(
-            TestNode("1-1"),
-            TestNode("1-3"),
-            TestNode("1-4")
+        val resultTreeRoot = DefaultMutableTreeNode("1").including(
+            DefaultMutableTreeNode("1-1"),
+            DefaultMutableTreeNode("1-3"),
+            DefaultMutableTreeNode("1-4")
         )
 
-        val mutationsTree = TreesDiffManager().makeMutationsTree(sourceTreeRoot, resultTreeRoot)
+        val mutationsTree = TreeDiffManager().makeMutationsTree(sourceTreeRoot, resultTreeRoot)
 
         assertNotNull(mutationsTree, "Mutations tree must be non null")
 
-        val rootModel = mutationsTree.userObject as? TreesDiffManager.DiffNodeModel<*>
+        val rootModel = mutationsTree.userObject as? TreeDiffManager.DiffNodeModel<*>
 
         assertNotNull(rootModel, "Root sourceNodeModel must be non null")
 
@@ -70,35 +58,36 @@ class TreeTests {
 
         assertEquals(rootMutations.size, 2)
 
-        assertEquals(sourceTreeRoot.model, TestNodeModel("1"))
+        assertEquals(sourceTreeRoot.userObject, "1")
     }
 
-    @test fun `Test node mutations`() {
-        val sourceTreeRoot = TestNode("1").including(
-            TestNode("1-1"),
-            TestNode("1-2").including(
-                TestNode("2-1"),
-                TestNode("2-2"),
-                TestNode("2-3")
-            ) as TestNode,
-            TestNode("1-3")
+    @test
+    fun `Test default node mutations`() {
+        val sourceTreeRoot = DefaultMutableTreeNode("1").including(
+            DefaultMutableTreeNode("1-1"),
+            DefaultMutableTreeNode("1-2").including(
+                DefaultMutableTreeNode("2-1"),
+                DefaultMutableTreeNode("2-2"),
+                DefaultMutableTreeNode("2-3")
+            ),
+            DefaultMutableTreeNode("1-3")
         )
 
-        val resultTreeRoot = TestNode("1").including(
-            TestNode("1-1"),
-            TestNode("1-2").including(
-                TestNode("2-1"),
-                TestNode("2-3"),
-                TestNode("2-4")
-            ) as TestNode,
-            TestNode("1-3")
+        val resultTreeRoot = DefaultMutableTreeNode("1").including(
+            DefaultMutableTreeNode("1-1"),
+            DefaultMutableTreeNode("1-2").including(
+                DefaultMutableTreeNode("2-1"),
+                DefaultMutableTreeNode("2-3"),
+                DefaultMutableTreeNode("2-4")
+            ),
+            DefaultMutableTreeNode("1-3")
         )
 
-        val mutationsTree = TreesDiffManager().makeMutationsTree(sourceTreeRoot, resultTreeRoot)
+        val mutationsTree = TreeDiffManager().makeMutationsTree(sourceTreeRoot, resultTreeRoot)
 
         assertNotNull(mutationsTree, "Mutations tree must be non null")
 
-        val rootNodeModel = mutationsTree.userObject as? TreesDiffManager.DiffNodeModel<*>
+        val rootNodeModel = mutationsTree.userObject as? TreeDiffManager.DiffNodeModel<*>
 
         assertNotNull(rootNodeModel, "Model must be non null")
 
@@ -108,14 +97,21 @@ class TreeTests {
 
         val childNode = mutationsTree.firstChild
 
-        childNode.assertedCast<DefaultMutableTreeNode> { "" }
+        childNode.assertedCast<DefaultMutableTreeNode> { "Child node must `DefaultMutableTreeNode`" }
 
-        val childNodeModel = (childNode as DefaultMutableTreeNode).userObject as? TreesDiffManager.DiffNodeModel<*>
+        val childNodeModel = (childNode as DefaultMutableTreeNode).userObject as? TreeDiffManager.DiffNodeModel<*>
 
-        assertNotNull(childNodeModel, "Model must be non null")
+        assertNotNull(childNodeModel, "Inner model must be non null")
 
         val rootMutations = childNodeModel.mutations
 
         assertEquals(rootMutations.size, 2)
+    }
+
+    private fun DefaultMutableTreeNode.including(vararg nodes: DefaultMutableTreeNode): DefaultMutableTreeNode {
+        nodes.asList().forEach {
+            this.add(it)
+        }
+        return this
     }
 }
