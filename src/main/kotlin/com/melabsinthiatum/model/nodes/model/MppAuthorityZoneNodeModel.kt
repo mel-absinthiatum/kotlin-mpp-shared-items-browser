@@ -26,6 +26,12 @@ package com.melabsinthiatum.model.nodes.model
 import com.melabsinthiatum.services.imageManager.CustomIcons
 import javax.swing.Icon
 
+
+/** <code>MppAuthorityZoneModelInterface</code> is a node model for an authority zone
+ * representation in a Shared Elements tree.
+ *
+ * @see com.melabsinthiatum.model.modulesRoutines.MppAuthorityZone
+ */
 interface MppAuthorityZoneModelInterface {
     val title: String
 }

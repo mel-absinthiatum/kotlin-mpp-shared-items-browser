@@ -21,7 +21,7 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsTree.tree
+package com.melabsinthiatum.sharedElementsBrowser.tree
 
 import com.intellij.openapi.project.DumbServiceImpl
 import com.intellij.openapi.project.Project
@@ -40,6 +40,9 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
+/**
+ * <code>SharedTreeProvider</code> provides the shared elements tree for a specific project.
+ */
 class SharedTreeProvider {
 
     suspend fun sharedTreeRoot(project: Project): RootNode = suspendCoroutine { cont ->
@@ -52,10 +55,15 @@ class SharedTreeProvider {
         }
     }
 
+
+    //
+    //  Iterate through files
+    //
+
     private fun iterateAllZones(project: Project): List<MppAuthorityZoneNode> {
         val mppAuthorityZones = MppAuthorityManager().provideAuthorityZonesForProject(project)
         return mppAuthorityZones.mapNotNull { authorityZone ->
-            val list = iterateTree(authorityZone, project)
+            val list = iterateThroughAuthorityZone(authorityZone, project)
 
             if (list.isNotEmpty()) {
                 val mppNodeModel = MppAuthorityZoneModel(authorityZone.commonModule.name)
@@ -67,6 +75,7 @@ class SharedTreeProvider {
             }
 
             // DEBUG
+
 //            list.forEach { fileNode ->
 //                println("file node: ${fileNode.sourceNodeModel.title}")
 //
@@ -82,10 +91,11 @@ class SharedTreeProvider {
 //                }
 //
 //            }
+
         }
     }
 
-    private fun iterateTree(authorityZone: MppAuthorityZone, project: Project): List<PackageNode> {
+    private fun iterateThroughAuthorityZone(authorityZone: MppAuthorityZone, project: Project): List<PackageNode> {
         val sourceRoots = authorityZone.commonModule.sourceRoots
 
         val psiFiles = mutableListOf<PsiFile>()
@@ -100,7 +110,7 @@ class SharedTreeProvider {
         }
 
         return psiFiles.mapNotNull { psiFile ->
-            val children = registerDeclaration(psiFile)
+            val children = registerGlobalLevelDeclaration(psiFile)
 
             if (children.isNotEmpty()) {
                 val fileNodeModel = FileNodeModel(psiFile.name, psiFile.virtualFile)
@@ -113,7 +123,10 @@ class SharedTreeProvider {
         }
     }
 
-    private fun registerDeclaration(element: PsiElement): List<SharedElementNode> {
+
+    // Handle shared declaration
+
+    private fun registerGlobalLevelDeclaration(element: PsiElement): List<SharedElementNode> {
         val list = mutableListOf<SharedElementNode>()
         element.acceptChildren(
             namedDeclarationVisitor { declaration ->
@@ -134,6 +147,11 @@ class SharedTreeProvider {
         }
         return list
     }
+
+
+    //
+    //  Register a shared element with common and platform declarations
+    //
 
     private fun makeElementNode(declaration: KtDeclaration): SharedElementNode? {
         val isConformingSharedDeclaration = declaration.isExpectDeclaration()
@@ -181,6 +199,11 @@ class SharedTreeProvider {
         }
     }
 
+
+    //
+    //  Register different PSI Declarations
+    //
+
     private fun registerAnnotation(annotationClass: KtClass): SharedElementNode {
         val stub = annotationClass.stub
         val model =
@@ -223,8 +246,7 @@ class SharedTreeProvider {
     ): SharedElementNode {
         val stub = objectDeclaration.stub
 
-        val model =
-            SharedElementModel(objectDeclaration.name, DeclarationType.OBJECT, stub)
+        val model = SharedElementModel(objectDeclaration.name, DeclarationType.OBJECT, stub)
 
         val node = SharedElementNode(model)
 

@@ -21,7 +21,7 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsTree.settings
+package com.melabsinthiatum.sharedElementsBrowser.settings
 
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.ui.DialogWrapper
@@ -32,6 +32,12 @@ import java.awt.event.*
 import javax.swing.*
 
 
+/**
+ * <code>SharedElementsTreeSettingsViewWrapper</code> is a dialog window
+ * for Shared Elements Browser settings.
+ *
+ * @see TreeSettingsComponent
+ */
 class SharedElementsTreeSettingsViewWrapper : DialogWrapper(true) {
 
     init {

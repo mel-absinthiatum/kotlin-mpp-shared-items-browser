@@ -25,8 +25,12 @@ package com.melabsinthiatum.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.melabsinthiatum.sharedElementsTree.settings.SharedElementsTreeSettingsViewWrapper
+import com.melabsinthiatum.sharedElementsBrowser.settings.SharedElementsTreeSettingsViewWrapper
 
+/**
+ * <code>TreeSettingsAction</code> displays Shared Elements Browser settings
+ * window.
+ */
 class TreeSettingsAction: AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         SharedElementsTreeSettingsViewWrapper().showAndGet()

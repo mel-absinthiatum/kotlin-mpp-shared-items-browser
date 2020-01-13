@@ -28,7 +28,10 @@ import com.melabsinthiatum.services.imageManager.CustomIcons
 import javax.swing.Icon
 
 
-interface FileNodeModelInterface: NodeModel {
+/**
+ * <code>FileNodeModelInterface</code> is a model for a plain file representation.
+ */
+interface FileNodeModelInterface : NodeModel {
     val title: String
     val virtualFile: VirtualFile
 }
@@ -37,7 +40,7 @@ interface FileNodeModelInterface: NodeModel {
 data class FileNodeModel(
     override val title: String,
     override val virtualFile: VirtualFile
-): FileNodeModelInterface {
+) : FileNodeModelInterface {
 
     override fun getLabelText(): String = title
 

@@ -21,18 +21,17 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsTree.toolWindow
+package com.melabsinthiatum.sharedElementsBrowser.tree.diff
 
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.ToolWindow
-import com.intellij.openapi.wm.ToolWindowFactory
-import com.intellij.ui.content.ContentFactory
+import javax.swing.tree.MutableTreeNode
 
-class MppToolWindowFactory : ToolWindowFactory {
-    override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        val myToolWindow = MppToolWindow(project, toolWindow)
-        val contentFactory = ContentFactory.SERVICE.getInstance()
-        val content = contentFactory.createContent(myToolWindow.content, "", false)
-        toolWindow.contentManager.addContent(content)
-    }
-}
+/**
+ * Variants of tree mutations.
+ *
+ * @see TreeDiffManager
+ */
+sealed class TreeMutation
+
+data class Insert(val node: MutableTreeNode, val parent: MutableTreeNode) : TreeMutation()
+data class Remove(val node: MutableTreeNode, val parent: MutableTreeNode) : TreeMutation()
+data class Move(val node: MutableTreeNode, val oldParent: MutableTreeNode, val newParent: MutableTreeNode) : TreeMutation()

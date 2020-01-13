@@ -21,34 +21,27 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsTree
+package com.melabsinthiatum.sharedElementsBrowser.tree
+
+import com.intellij.openapi.project.Project
+import com.melabsinthiatum.services.extensionPoints.SharedElementsTopics
+import com.melabsinthiatum.services.extensionPoints.SharedElementsTopicsNotifier
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
-import com.intellij.ui.JBDefaultTreeCellRenderer
-import com.intellij.ui.components.JBLabel
-import com.melabsinthiatum.model.nodes.model.NodeModel
-import java.awt.Component
-import javax.swing.Icon
-import javax.swing.JTree
-import javax.swing.tree.DefaultMutableTreeNode
+/**
+ * <code>SharedElementsUpdateManager</code> updates shared elements tree
+ * and notifies when completed using the <code>SHARED_ELEMENTS_TREE_TOPIC</code>
+ */
+object SharedElementsUpdateManager {
+    fun update(project: Project) {
+        GlobalScope.launch {
+            val root = SharedTreeProvider().sharedTreeRoot(project)
 
-class MppSharedItemsTreeCellRenderer(tree: JTree) : JBDefaultTreeCellRenderer(tree) {
-
-    override fun getTreeCellRendererComponent(tree: JTree?, value: Any?, sel: Boolean, expanded: Boolean,
-                                              leaf: Boolean, row: Int, hasFocus: Boolean): Component {
-        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)
-        if (value is DefaultMutableTreeNode) {
-            val model =  value.userObject as? NodeModel ?: return this
-            return makeComponent(model.getLabelText(), model.getIcon())
+            val publisher: SharedElementsTopicsNotifier =
+                project.messageBus.syncPublisher(SharedElementsTopics.SHARED_ELEMENTS_TREE_TOPIC)
+            publisher.sharedElementsUpdated(root)
         }
-
-        return this
-    }
-
-    private fun makeComponent(title: String, icon: Icon?): JBLabel {
-        val label = JBLabel()
-        label.text = title
-        label.icon = icon
-        return label
     }
 }

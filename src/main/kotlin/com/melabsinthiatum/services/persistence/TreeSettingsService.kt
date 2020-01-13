@@ -29,7 +29,17 @@ import com.melabsinthiatum.services.extensionPoints.SharedElementsTopics
 import com.melabsinthiatum.services.extensionPoints.SharedElementsTreeSettingsNotifier
 
 
-@State(name = "com.melabsinthiatum.services.persistence.TreeSettingsComponent", storages = [Storage(value = "TreeSettingsComponent.xml")])
+/**
+ * <code>TreeSettingsComponent</code> is a persistent store service
+ * for Shared Elements Browser settings. Еhese settings are currently common
+ * to the entire application.
+ */
+@State(
+    name = "com.melabsinthiatum.services.persistence.TreeSettingsComponent",
+    storages = [
+        Storage(value = "TreeSettingsComponent.xml")
+    ]
+)
 class TreeSettingsComponent: PersistentStateComponent<TreeSettingsComponent.State> {
     class State(
         var reloadInterval: Long = 10

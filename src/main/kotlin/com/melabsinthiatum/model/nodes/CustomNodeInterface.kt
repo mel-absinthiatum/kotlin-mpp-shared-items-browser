@@ -27,6 +27,13 @@ import com.melabsinthiatum.model.nodes.model.NodeModel
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeNode
 
+
+/**
+ * <code>CustomNodeInterface</code> is a simple non-generic interface for custom
+ * immutable tree building.
+ *
+ * @see TemplateNode for interface with generics.
+ */
 interface CustomNodeInterface : TreeNode {
     fun removeNodeParent()
     fun nodeModel(): NodeModel?

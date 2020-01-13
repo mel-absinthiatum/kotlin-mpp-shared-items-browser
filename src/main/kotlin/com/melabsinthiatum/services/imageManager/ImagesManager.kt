@@ -38,7 +38,7 @@ class CustomIcons {
 
     class Nodes {
         companion object {
-            val Root = AllIcons.Nodes.Folder
+            val Root = AllIcons.Nodes.Folder ?: load("com/melabsinthiatum/file.png")
             val File = load("com/melabsinthiatum/file.png")
             val Annotation = load("com/melabsinthiatum/annotation.png")
             val Property = load("com/melabsinthiatum/property.png")

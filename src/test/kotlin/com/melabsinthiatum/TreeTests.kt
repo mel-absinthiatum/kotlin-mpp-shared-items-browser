@@ -23,7 +23,7 @@
 
 package com.melabsinthiatum
 
-import com.melabsinthiatum.sharedElementsTree.tree.diff.TreeDiffManager
+import com.melabsinthiatum.sharedElementsBrowser.tree.diff.TreeDiffManager
 import org.jetbrains.kotlin.utils.addToStdlib.assertedCast
 import javax.swing.tree.DefaultMutableTreeNode
 import kotlin.test.assertEquals

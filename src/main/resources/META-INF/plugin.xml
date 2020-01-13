@@ -35,12 +35,12 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceInterface="com.melabsinthiatum.services.persistence.TreeSettingsComponent"
-                            serviceImplementation="com.melabsinthiatum.services.persistence.TreeSettingsComponent"/>
+        <applicationService
+                serviceImplementation="com.melabsinthiatum.services.persistence.TreeSettingsComponent"/>
 
         <toolWindow id="Expect-Actual Interface" secondary="false" icon="/com/melabsinthiatum/shared_items_icon.svg"
                     anchor="right"
-                    factoryClass="com.melabsinthiatum.sharedElementsTree.toolWindow.MppToolWindowFactory" order="last"/>
+                    factoryClass="com.melabsinthiatum.sharedElementsBrowser.toolWindow.SharedElementsToolWindowFactory" order="last"/>
 
         <postStartupActivity implementation="com.melabsinthiatum.services.extensionPoints.CustomStartupActivity"/>
     </extensions>
@@ -49,7 +49,7 @@
         <action id="com.melabsinthiatum.actions.RefreshTreeAction" class="com.melabsinthiatum.actions.RefreshTreeAction"
                 text="Refresh"/>
         <action id="com.melabsinthiatum.actions.TreeSettingsAction"
-                class="com.melabsinthiatum.actions.TreeSettingsAction" text="Tree settings"
+                class="com.melabsinthiatum.actions.TreeSettingsAction" text="Tree Settings"
                 description="Shared elements tree settings"/>
     </actions>
 </idea-plugin>

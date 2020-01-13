@@ -25,12 +25,15 @@ package com.melabsinthiatum.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.melabsinthiatum.sharedElementsTree.tree.UpdateManager
+import com.melabsinthiatum.sharedElementsBrowser.tree.SharedElementsUpdateManager
 
-
+/**
+ * <code>RefreshTreeAction</code> launches updating the shared element tree of
+ * a specific project.
+ */
 class RefreshTreeAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-        UpdateManager(project).update()
+        SharedElementsUpdateManager.update(project)
     }
 }

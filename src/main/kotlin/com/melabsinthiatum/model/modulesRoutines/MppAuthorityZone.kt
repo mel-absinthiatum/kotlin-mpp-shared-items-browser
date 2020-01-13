@@ -25,5 +25,9 @@ package com.melabsinthiatum.model.modulesRoutines
 
 import com.intellij.openapi.module.Module
 
-
+/**
+ * The so-called zone of authority is a set of project modules
+ * headed by one common-module. Dependent modules are usually
+ * source sets for various platforms code.
+ */
 class MppAuthorityZone(var commonModule: Module)

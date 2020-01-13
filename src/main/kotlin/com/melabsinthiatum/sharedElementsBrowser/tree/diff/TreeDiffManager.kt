@@ -1,19 +1,52 @@
-package com.melabsinthiatum.sharedElementsTree.tree.diff
+package com.melabsinthiatum.sharedElementsBrowser.tree.diff
 
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.MutableTreeNode
 
+
+/**
+ * <code>TreeDiffManager</code> provides a hierarchical object (diff-tree) representing
+ * a set of editorial operations necessary for converting the source tree to the target tree.
+ */
+//TODO change to object
 class TreeDiffManager {
 
+    /**
+     * The tuple of two comparing nodes.
+     */
     class NodesTuple(val oldNode: DefaultMutableTreeNode, val newNode: DefaultMutableTreeNode)
 
+    /**
+     * The model containing the information about mutations (insert, remove) on the current
+     * node level and the list of children with mutations or their ever mutated descendants.
+     * It used for constructing diff-tree nodes with their models.
+     */
     class SiftResult(val mutations: List<TreeMutation>, val unchanged: List<NodesTuple>)
 
+    /**
+     * The diff-tree node model containing the information about mutations (insert, remove)
+     * on the current node level as well as the object indicating a specific original tree
+     * node to which these mutations relate.
+     */
     class DiffNodeModel<M : Any>(val sourceNodeModel: M, val mutations: List<TreeMutation>)
 
+
+    /**
+     * Retrieve the diff-tree for specified original and target trees.
+     *
+     * @param   oldNode     original tree root node
+     * @param   newNode     target tree root node
+     *
+     * @return      a diff-tree represented by the tree constructed of DefaultMutableTreeNode-s
+     *              with associated DiffNodeModel objects as default node userObject-s
+     */
     fun makeMutationsTree(oldNode: DefaultMutableTreeNode, newNode: DefaultMutableTreeNode): DefaultMutableTreeNode? {
         return makeMutationsNode(oldNode,newNode)
     }
+
+
+    //
+    //  Private
+    //
 
     private fun makeMutationsNode(
         oldNode: DefaultMutableTreeNode,
@@ -70,9 +103,3 @@ class TreeDiffManager {
         return childrenList.filterIsInstance<DefaultMutableTreeNode>().takeIf { it.size == childrenList.size }
     }
 }
-
-sealed class TreeMutation
-
-data class Insert(val node: MutableTreeNode, val parent: MutableTreeNode) : TreeMutation()
-data class Remove(val node: MutableTreeNode, val parent: MutableTreeNode) : TreeMutation()
-data class Move(val node: MutableTreeNode, val oldParent: MutableTreeNode, val newParent: MutableTreeNode) : TreeMutation()

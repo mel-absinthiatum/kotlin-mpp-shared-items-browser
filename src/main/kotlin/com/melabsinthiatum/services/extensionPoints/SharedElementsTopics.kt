@@ -26,6 +26,11 @@ package com.melabsinthiatum.services.extensionPoints
 import com.intellij.util.messages.Topic
 import com.melabsinthiatum.model.nodes.RootNode
 
+
+/**
+ * <code>SharedElementsTopics</code> contains custom Topics related to
+ * Shared Elements Browser events.
+ */
 class SharedElementsTopics {
     companion object {
         var SHARED_ELEMENTS_TREE_TOPIC: Topic<SharedElementsTopicsNotifier> =

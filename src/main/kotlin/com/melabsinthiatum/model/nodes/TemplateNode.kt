@@ -30,36 +30,75 @@ import java.util.*
 import javax.swing.tree.TreeNode
 
 
+/**
+ * <code>TemplateNodeInterface</code> is a templated interface for custom
+ * immutable tree building.
+ *
+ * @see TemplateNode
+ */
 interface TemplateNodeInterface<M : NodeModel, C : CustomNodeInterface> : CustomNodeInterface {
     var model: M
 
-    fun add(node: C)
+    fun add(newChild: C)
 
-    fun add(nodes: List<C>)
+    fun add(newChildren: List<C>)
 }
 
 
+/**
+ * <code>TemplateNode</code> is an abstract base class providing a universal
+ * templated node for custom immutable tree building.
+ *
+ * @sample SharedElementNode
+ */
 abstract class TemplateNode<M : NodeModel, C : CustomNodeInterface>(
     override var model: M,
     override var nodeParent: CustomNodeInterface? = null,
     private val children: MutableList<C> = mutableListOf()
 ) : TemplateNodeInterface<M, C> {
 
+    //
+    //  TemplateNodeInterface
+    //
+
     override fun childNodes(): List<C> = children
 
     override fun nodeModel(): NodeModel? = model
 
-    override fun add(node: C) {
+    /**
+     * Adds a descendant to the current tree node without the possibility to remove.
+     *
+     * @param   newChild        the CustomNodeInterface item to add to this node
+     * @exception       IllegalArgumentException        if <code>newChild</code> is an
+     *                                                  ancestor of this node
+     * @exception       IllegalStateException   if this node does not allow
+     *                                          children
+     */
+    override fun add(newChild: C) {
         check(allowsChildren) { "node does not allow children" }
-        require(!isNodeAncestor(node)) { "new child is an ancestor" }
+        require(!isNodeAncestor(newChild)) { "new child is an ancestor" }
 
-        node.nodeParent = this
-        children.add(node)
+        newChild.nodeParent = this
+        children.add(newChild)
     }
 
-    override fun add(nodes: List<C>) {
-        nodes.forEach { add(it) }
+    /**
+     * Adds a list of descendants to the current tree node without the possibility to remove.
+     *
+     * @param   newChildren        the CustomNodeInterface item list to add to this node
+     * @exception       IllegalArgumentException        if <code>newChild</code> is an
+     *                                                  ancestor of this node
+     * @exception       IllegalStateException   if this node does not allow
+     *                                          children
+     */
+    override fun add(newChildren: List<C>) {
+        newChildren.forEach { add(it) }
     }
+
+
+    //
+    //  TreeNode
+    //
 
     override fun children(): Enumeration<out TreeNode> = children.toEnumeration()
 
@@ -79,10 +118,20 @@ abstract class TemplateNode<M : NodeModel, C : CustomNodeInterface>(
 
     override fun getAllowsChildren(): Boolean = true
 
+
+    //
+    //  Utils
+    //
+
     fun including(vararg nodes: C): TemplateNode<M, C> {
         this.add(nodes.asList())
         return this
     }
+
+
+    //
+    //  Private
+    //
 
     private fun isNodeAncestor(anotherNode: TreeNode?): Boolean {
         if (anotherNode == null) {
@@ -100,15 +149,21 @@ abstract class TemplateNode<M : NodeModel, C : CustomNodeInterface>(
 }
 
 
+/**
+ * <code>TemplateLeaf</code> is an abstract base class providing a universal
+ * templated leaf node for custom immutable tree building.
+ *
+ * @sample ExpectOrActualNode
+ */
 abstract class TemplateLeaf<M : NodeModel>(model: M) : TemplateNode<M, Nothing>(model) {
     override fun getAllowsChildren(): Boolean = false
 
-    override fun add(node: Nothing) {
-        assert(false) { "Not allowed." }
+    override fun add(newChild: Nothing) {
+        assert(false) { "Prohibited operation." }
     }
 
-    override fun add(nodes: List<Nothing>) {
-        assert(false) { "Not allowed." }
+    override fun add(newChildren: List<Nothing>) {
+        assert(false) { "Prohibited operation." }
     }
 
     override fun children(): Enumeration<out TreeNode> = emptyEnumeration()
@@ -118,16 +173,23 @@ abstract class TemplateLeaf<M : NodeModel>(model: M) : TemplateNode<M, Nothing>(
     override fun getChildCount(): Int = 0
 
     override fun getChildAt(childIndex: Int): TreeNode? {
-        assert(false) { "Not allowed." }
+        assert(false) { "Prohibited operation." }
         return null
     }
 
     override fun getIndex(node: TreeNode?): Int {
-        assert(false) { "Not allowed." }
+        assert(false) { "Prohibited operation." }
         return -1
     }
 }
 
+
+/**
+ * <code>TemplateRootNode</code> is an abstract base class providing a universal
+ * templated root node for custom immutable tree building.
+ *
+ * @sample RootNode
+ */
 abstract class TemplateRootNode<M : NodeModel, C : CustomNodeInterface>(
     model: M
 ) : TemplateNode<M, C>(model) {
@@ -135,7 +197,7 @@ abstract class TemplateRootNode<M : NodeModel, C : CustomNodeInterface>(
     override var nodeParent: CustomNodeInterface?
         get() = null
         set(value) {
-            assert(false) { "Not allowed." }
+            assert(false) { "Prohibited operation." }
         }
 
     override fun getParent(): TreeNode? = null

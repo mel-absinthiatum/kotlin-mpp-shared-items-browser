@@ -21,23 +21,19 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsTree.tree
+package com.melabsinthiatum.sharedElementsBrowser.toolWindow
 
 import com.intellij.openapi.project.Project
-import com.melabsinthiatum.services.extensionPoints.SharedElementsTopics
-import com.melabsinthiatum.services.extensionPoints.SharedElementsTopicsNotifier
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.intellij.openapi.wm.ToolWindow
+import com.intellij.openapi.wm.ToolWindowFactory
+import com.intellij.ui.content.ContentFactory
 
 
-class UpdateManager(private val project: Project) {
-    fun update() {
-        GlobalScope.launch {
-            val root = SharedTreeProvider().sharedTreeRoot(project)
-            val myBus = project.messageBus
-            val publisher: SharedElementsTopicsNotifier =
-                myBus.syncPublisher(SharedElementsTopics.SHARED_ELEMENTS_TREE_TOPIC)
-            publisher.sharedElementsUpdated(root)
-        }
+class SharedElementsToolWindowFactory : ToolWindowFactory {
+    override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
+        val myToolWindow = SharedElementsBrowser(project, toolWindow)
+        val contentFactory = ContentFactory.SERVICE.getInstance()
+        val content = contentFactory.createContent(myToolWindow.content, "", false)
+        toolWindow.contentManager.addContent(content)
     }
 }

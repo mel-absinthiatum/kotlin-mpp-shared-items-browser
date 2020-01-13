@@ -21,21 +21,34 @@
  *
  */
 
-package com.melabsinthiatum.model.nodes.model
+package com.melabsinthiatum.sharedElementsBrowser
 
+import com.intellij.ui.JBDefaultTreeCellRenderer
+import com.intellij.ui.components.JBLabel
+import com.melabsinthiatum.model.nodes.model.NodeModel
+import java.awt.Component
 import javax.swing.Icon
+import javax.swing.JTree
+import javax.swing.tree.DefaultMutableTreeNode
 
 
-/**
- * <code>RootNodeModel</code> is a model for project root representation.
- * This node is typically invisible.
- */
-data class RootNodeModel(val projectName: String): NodeModel {
-    override fun getLabelText(): String {
-        return "project $projectName"
+class MppSharedItemsTreeCellRenderer(tree: JTree) : JBDefaultTreeCellRenderer(tree) {
+
+    override fun getTreeCellRendererComponent(tree: JTree?, value: Any?, sel: Boolean, expanded: Boolean,
+                                              leaf: Boolean, row: Int, hasFocus: Boolean): Component {
+        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)
+        if (value is DefaultMutableTreeNode) {
+            val model =  value.userObject as? NodeModel ?: return this
+            return makeComponent(model.getLabelText(), model.getIcon())
+        }
+
+        return this
     }
 
-    override fun getIcon(): Icon? {
-        return null
+    private fun makeComponent(title: String, icon: Icon?): JBLabel {
+        val label = JBLabel()
+        label.text = title
+        label.icon = icon
+        return label
     }
 }

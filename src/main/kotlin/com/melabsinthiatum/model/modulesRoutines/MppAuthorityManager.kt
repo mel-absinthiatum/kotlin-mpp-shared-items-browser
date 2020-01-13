@@ -29,7 +29,9 @@ import org.jetbrains.kotlin.idea.caches.project.isMPPModule
 import org.jetbrains.kotlin.idea.project.platform
 import org.jetbrains.kotlin.platform.impl.CommonIdePlatformKind
 
-
+/**
+ * @see MppAuthorityZone
+ */
 class MppAuthorityManager {
 
     fun provideAuthorityZonesForProject(project: Project): Collection<MppAuthorityZone> {

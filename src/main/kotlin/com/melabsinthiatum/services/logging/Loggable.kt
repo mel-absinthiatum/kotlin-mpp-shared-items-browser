@@ -27,7 +27,10 @@ import com.intellij.openapi.diagnostic.Logger
 import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObject
 
-// Return logger for Java class, if companion object fix the name
+
+/**
+ * Return logger for Java class, if companion object fix the name
+ */
 fun <T: Any> logger(forClass: Class<T>): Logger {
     return Logger.getInstance(unwrapCompanionClass(forClass).name)
 }
@@ -65,7 +68,7 @@ fun <R : Any> R.injectLogger(): Lazy<Logger> {
 }
 
 // marker interface and related extension (remove extension for Any.logger() in favour of this)
-interface Loggable {}
+interface Loggable
 fun Loggable.logger(): Logger = logger(this.javaClass)
 
 // abstract base class to provide logging, intended for companion objects more than classes but works for either

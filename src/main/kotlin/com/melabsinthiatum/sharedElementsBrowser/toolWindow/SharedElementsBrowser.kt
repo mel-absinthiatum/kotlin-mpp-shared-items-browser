@@ -21,7 +21,7 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsTree.toolWindow
+package com.melabsinthiatum.sharedElementsBrowser.toolWindow
 
 import com.intellij.codeInsight.highlighting.HighlightManager
 import com.intellij.openapi.actionSystem.ActionManager
@@ -48,9 +48,9 @@ import com.melabsinthiatum.services.imageManager.CustomIcons
 import com.melabsinthiatum.services.logging.Loggable
 import com.melabsinthiatum.services.logging.logger
 import com.melabsinthiatum.services.persistence.TreeSettingsComponent
-import com.melabsinthiatum.sharedElementsTree.MppSharedItemsTreeCellRenderer
-import com.melabsinthiatum.sharedElementsTree.tree.UpdateManager
-import com.melabsinthiatum.sharedElementsTree.tree.diff.*
+import com.melabsinthiatum.sharedElementsBrowser.MppSharedItemsTreeCellRenderer
+import com.melabsinthiatum.sharedElementsBrowser.tree.SharedElementsUpdateManager
+import com.melabsinthiatum.sharedElementsBrowser.tree.diff.*
 import kotlinx.coroutines.*
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
@@ -59,7 +59,14 @@ import javax.swing.*
 import javax.swing.tree.*
 
 
-class MppToolWindow(private val project: Project, private val toolWindow: ToolWindow) : Loggable {
+/**
+ * <code>SharedElementsBrowser</code> is a tool window content panel containing
+ * a shared elements tree providing the ability to navigate to objects as well
+ * as settings and update buttons.
+ *
+ * Also, the browser can perform updates by a predefined in the settings time interval.
+*/
+class SharedElementsBrowser(private val project: Project, private val toolWindow: ToolWindow) : Loggable {
 
     var content: JPanel
 
@@ -67,7 +74,7 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
     private val sharedElementsTree: Tree
     private var treeRoot: DefaultMutableTreeNode = DefaultMutableTreeNode(RootNodeModel(project.name))
     private val treeModel: DefaultTreeModel
-    private val updateManager = UpdateManager(project)
+    private val updateManager = SharedElementsUpdateManager
     private var updateJob: Job? = null
     private var updateInterval: Long
     private var msgBus = project.messageBus.connect(project)
@@ -89,6 +96,11 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
         updateInterval = service?.state?.reloadInterval ?: 10
         updateJob = runRepeatingUpdates(repeatMillis = updateInterval * 1000)
     }
+
+
+    //
+    //  Initial configuration
+    //
 
     private fun decorator(tree: Tree): ToolbarDecorator {
         val refreshActionButton = AnActionButton.fromAction(
@@ -115,6 +127,7 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
             isRootVisible = false
             selectionModel.selectionMode = TreeSelectionModel.SINGLE_TREE_SELECTION
             cellRenderer = MppSharedItemsTreeCellRenderer(sharedElementsTree)
+            // TODO: move TreeSelectionListener to another file
             addTreeSelectionListener { event ->
                 val source = event.source as JTree
                 val node = source.lastSelectedPathComponent as? DefaultMutableTreeNode
@@ -158,6 +171,34 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
                 }
             })
     }
+
+
+    //
+    //  Updates launching
+    //
+
+    private fun runRepeatingUpdates(delayMillis: Long = 0, repeatMillis: Long = 0): Job {
+        logger.debug("Run repeating updates $repeatMillis.")
+        return startCoroutineTimer(delayMillis, repeatMillis) { runUpdate() }
+    }
+
+    private fun runUpdate() {
+        val isAnyFocusedEditor = FileEditorManager.getInstance(project).selectedEditors.any { editor ->
+            val window = SwingUtilities.getWindowAncestor(editor.component)
+            window != null && window.isFocused
+        }
+
+        val isToolWindowVisible = toolWindow.isVisible
+
+        if (isAnyFocusedEditor && isToolWindowVisible) {
+            updateManager.update(project)
+        }
+    }
+
+
+    //
+    //  Tree reloading
+    //
 
     private fun updateTree(sourceNode: DefaultMutableTreeNode, diffNode: DefaultMutableTreeNode) {
         val diffNodeModel = diffNode.userObject as? TreeDiffManager.DiffNodeModel<*> ?: return
@@ -205,25 +246,22 @@ class MppToolWindow(private val project: Project, private val toolWindow: ToolWi
             sharedElementsTree.expandPath(path)
         }
     }
-
-    private fun runRepeatingUpdates(delayMillis: Long = 0, repeatMillis: Long = 0): Job {
-        logger.debug("Run repeating updates $repeatMillis.")
-        return startCoroutineTimer(delayMillis, repeatMillis) { runUpdate() }
-    }
-
-    private fun runUpdate() {
-        val isAnyFocusedEditor = FileEditorManager.getInstance(project).selectedEditors.any { editor ->
-            val window = SwingUtilities.getWindowAncestor(editor.component)
-            window != null && window.isFocused
-        }
-
-        val isToolWindowVisible = toolWindow.isVisible
-
-        if (isAnyFocusedEditor && isToolWindowVisible) {
-            updateManager.update()
-        }
-    }
 }
+
+
+private fun startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long = 0, action: () -> Unit) =
+    GlobalScope.launch {
+        delay(delayMillis)
+        if (repeatMillis > 0) {
+            while (isActive) {
+                action()
+                delay(repeatMillis)
+            }
+        } else {
+            action()
+        }
+    }
+
 
 private fun Editor.highlightOnce(startOffset: Int, endOffset: Int) {
     val attributes = EditorColorsManager.getInstance().globalScheme.getAttributes(
@@ -252,17 +290,3 @@ private fun Editor.highlightOnce(startOffset: Int, endOffset: Int) {
 
     scrollingModel.scrollToCaret(ScrollType.CENTER_UP)
 }
-
-private fun startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long = 0, action: () -> Unit) =
-    GlobalScope.launch {
-        delay(delayMillis)
-        if (repeatMillis > 0) {
-            while (isActive) {
-                action()
-                delay(repeatMillis)
-            }
-        } else {
-            action()
-        }
-    }
-

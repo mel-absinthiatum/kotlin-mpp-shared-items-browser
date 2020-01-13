@@ -28,6 +28,13 @@ import com.melabsinthiatum.model.DeclarationType
 import com.melabsinthiatum.services.imageManager.CustomIcons
 import javax.swing.Icon
 
+
+/**
+ * <code>SharedElementModelInterface</code> is a model for as such Shared Element
+ * with its AST declaration type info. Below this element in the tree is a set of leaf elements
+ * suggesting the location of general and platform declarations of the element in the code.
+ */
+// TODO remove stub
 interface SharedElementModelInterface {
     val name: String?
     val type: DeclarationType
