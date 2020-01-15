@@ -50,6 +50,7 @@ hs_err_pid*
 .idea/**/libraries
 .gradle
 /build/
+gradle.properties
 
 # Gradle and Maven with auto-import
 .idea/artifacts
