@@ -25,7 +25,7 @@ package com.melabsinthiatum.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.melabsinthiatum.sharedElementsBrowser.tree.SharedElementsUpdateManager
+import com.melabsinthiatum.sharedElements.SharedElementsUpdateManager
 
 /**
  * <code>RefreshTreeAction</code> launches updating the shared element tree of

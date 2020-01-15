@@ -1,4 +1,4 @@
-package com.melabsinthiatum.sharedElementsBrowser.tree.diff
+package com.melabsinthiatum.sharedElements.diff
 
 import javax.swing.tree.DefaultMutableTreeNode
 

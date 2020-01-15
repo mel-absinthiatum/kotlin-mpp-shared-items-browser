@@ -21,7 +21,7 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsBrowser.tree
+package com.melabsinthiatum.sharedElements
 
 import com.intellij.openapi.project.DumbServiceImpl
 import com.intellij.openapi.project.Project
@@ -29,8 +29,8 @@ import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.psi.*
 import com.melabsinthiatum.model.DeclarationType
 import com.melabsinthiatum.model.SharedType
-import com.melabsinthiatum.model.modulesRoutines.MppAuthorityManager
 import com.melabsinthiatum.model.modulesRoutines.MppAuthorityZone
+import com.melabsinthiatum.model.modulesRoutines.MppAuthorityZonesManager
 import com.melabsinthiatum.model.nodes.*
 import com.melabsinthiatum.model.nodes.model.*
 import kotlinx.coroutines.runBlocking
@@ -44,6 +44,8 @@ import kotlin.coroutines.suspendCoroutine
  * <code>SharedTreeProvider</code> provides the shared elements tree for a specific project.
  */
 class SharedTreeProvider {
+
+    private val mppAuthorityZonesManager = MppAuthorityZonesManager
 
     suspend fun sharedTreeRoot(project: Project): RootNode = suspendCoroutine { cont ->
         DumbServiceImpl.getInstance(project).smartInvokeLater {
@@ -61,7 +63,7 @@ class SharedTreeProvider {
     //
 
     private fun iterateAllZones(project: Project): List<MppAuthorityZoneNode> {
-        val mppAuthorityZones = MppAuthorityManager().provideAuthorityZonesForProject(project)
+        val mppAuthorityZones = mppAuthorityZonesManager.provideAuthorityZonesForProject(project)
         return mppAuthorityZones.mapNotNull { authorityZone ->
             val list = iterateThroughAuthorityZone(authorityZone, project)
 
@@ -152,7 +154,7 @@ class SharedTreeProvider {
 
 
     //
-    //  Register a shared element with common and platform declarations
+    //  Register shared element with common and platform declarations
     //
 
     private fun makeElementNode(declaration: KtDeclaration): SharedElementNode? {

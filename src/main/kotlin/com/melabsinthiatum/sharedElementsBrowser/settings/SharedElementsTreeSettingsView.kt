@@ -26,9 +26,8 @@ package com.melabsinthiatum.sharedElementsBrowser.settings
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.ui.DialogWrapper
 import com.melabsinthiatum.services.persistence.TreeSettingsComponent
-import com.sun.java.accessibility.util.AWTEventMonitor.addWindowListener
 import java.awt.Component
-import java.awt.event.*
+import java.awt.event.KeyEvent
 import javax.swing.*
 
 
@@ -87,12 +86,6 @@ class SharedElementsTreeSettingsViewWrapper : DialogWrapper(true) {
         dialogPanel.add(label)
         dialogPanel.add(reloadIntervalSpinner)
 
-        addWindowListener(object : WindowAdapter() {
-            override fun windowClosing(e: WindowEvent?) {
-                onCancel()
-            }
-        })
-
         dialogPanel.registerKeyboardAction(
             { onCancel() },
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -137,10 +130,8 @@ class SharedElementsTreeSettingsViewWrapper : DialogWrapper(true) {
             ServiceManager.getService(TreeSettingsComponent::class.java)
                 ?.loadState(TreeSettingsComponent.State(reloadInterval))
         }
-        dispose()
     }
 
     private fun onCancel() {
-        dispose()
     }
 }

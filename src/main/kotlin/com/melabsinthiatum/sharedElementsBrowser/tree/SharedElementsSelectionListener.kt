@@ -46,17 +46,18 @@ class SharedElementsSelectionListener(val project: Project) : TreeSelectionListe
     override fun valueChanged(event: TreeSelectionEvent?) {
         val source = event?.source as? JTree
 
-        source?.clearSelection()
-
         val node = source?.lastSelectedPathComponent as? DefaultMutableTreeNode
         val nodeModel = node?.userObject as? ExpectOrActualModelInterface
         val psi = nodeModel?.psi
         val file = psi?.containingFile?.virtualFile
+
         if (psi != null && file != null && file.isValid && !file.isDirectory) {
             val fileEditorManager = FileEditorManager.getInstance(project)
             fileEditorManager.openFile(file, true)
             fileEditorManager.selectedTextEditor?.highlightOnce(psi.startOffset, psi.endOffset)
         }
+
+        source?.clearSelection()
     }
 }
 

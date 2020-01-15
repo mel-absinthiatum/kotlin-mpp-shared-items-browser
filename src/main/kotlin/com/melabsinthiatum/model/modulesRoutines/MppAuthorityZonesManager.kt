@@ -23,22 +23,34 @@
 
 package com.melabsinthiatum.model.modulesRoutines
 
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.cli.common.arguments.K2MetadataCompilerArguments
+import org.jetbrains.kotlin.config.KotlinFacetSettingsProvider
 import org.jetbrains.kotlin.idea.caches.project.isMPPModule
-import org.jetbrains.kotlin.idea.project.platform
-import org.jetbrains.kotlin.platform.impl.CommonIdePlatformKind
+
 
 /**
  * @see MppAuthorityZone
  */
-class MppAuthorityManager {
+object MppAuthorityZonesManager {
 
     fun provideAuthorityZonesForProject(project: Project): Collection<MppAuthorityZone> {
-        val modules = ModuleManager.getInstance(project).modules
+        return ModuleManager.getInstance(project).modules
+            .filter { it.isMPPModule && it.isCommon() }
+            .map { module -> MppAuthorityZone(module) }
+    }
 
-        return modules.filter{ it.isMPPModule && it.platform?.kind == CommonIdePlatformKind }.map { module ->
-            MppAuthorityZone(module)
+    private fun Module.isCommon(): Boolean {
+        val companion = KotlinFacetSettingsProvider.Companion
+        val project = this.project
+        val compilerArguments = companion.getInstance(project)?.getInitializedSettings(this)?.compilerArguments
+
+        if (compilerArguments != null && compilerArguments is K2MetadataCompilerArguments) {
+            return true
         }
+
+        return false
     }
 }

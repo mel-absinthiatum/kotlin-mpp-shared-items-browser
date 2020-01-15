@@ -41,8 +41,10 @@ import com.melabsinthiatum.services.imageManager.CustomIcons
 import com.melabsinthiatum.services.logging.Loggable
 import com.melabsinthiatum.services.logging.logger
 import com.melabsinthiatum.services.persistence.TreeSettingsComponent
-import com.melabsinthiatum.sharedElementsBrowser.tree.*
-import com.melabsinthiatum.sharedElementsBrowser.tree.diff.*
+import com.melabsinthiatum.sharedElements.SharedElementsUpdateManager
+import com.melabsinthiatum.sharedElements.diff.*
+import com.melabsinthiatum.sharedElementsBrowser.tree.SharedElementsSelectionListener
+import com.melabsinthiatum.sharedElementsBrowser.tree.SharedElementsTreeCellRenderer
 import kotlinx.coroutines.*
 import java.util.*
 import javax.swing.JPanel
@@ -67,7 +69,8 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
     private val sharedElementsTree: Tree
     private var treeRoot: DefaultMutableTreeNode = DefaultMutableTreeNode(RootNodeModel(project.name))
     private val treeModel: DefaultTreeModel
-    private val updateManager = SharedElementsUpdateManager
+    private val updateManager =
+        SharedElementsUpdateManager
     private val diffManager = TreeDiffManager
     private var updateJob: Job? = null
     private var updateInterval: Long

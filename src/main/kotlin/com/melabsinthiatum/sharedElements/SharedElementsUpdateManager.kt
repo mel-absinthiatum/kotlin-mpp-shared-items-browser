@@ -21,17 +21,27 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsBrowser.tree.diff
+package com.melabsinthiatum.sharedElements
 
-import javax.swing.tree.MutableTreeNode
+import com.intellij.openapi.project.Project
+import com.melabsinthiatum.services.extensionPoints.SharedElementsTopics
+import com.melabsinthiatum.services.extensionPoints.SharedElementsTopicsNotifier
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+
 
 /**
- * Variants of tree mutations.
- *
- * @see TreeDiffManager
+ * <code>SharedElementsUpdateManager</code> updates shared elements tree
+ * and notifies when completed using the <code>SHARED_ELEMENTS_TREE_TOPIC</code>
  */
-sealed class TreeMutation
+object SharedElementsUpdateManager {
+    fun update(project: Project) {
+        GlobalScope.launch {
+            val root = SharedTreeProvider().sharedTreeRoot(project)
 
-data class Insert(val node: MutableTreeNode, val parent: MutableTreeNode) : TreeMutation()
-data class Remove(val node: MutableTreeNode, val parent: MutableTreeNode) : TreeMutation()
-data class Move(val node: MutableTreeNode, val oldParent: MutableTreeNode, val newParent: MutableTreeNode) : TreeMutation()
+            val publisher: SharedElementsTopicsNotifier =
+                project.messageBus.syncPublisher(SharedElementsTopics.SHARED_ELEMENTS_TREE_TOPIC)
+            publisher.sharedElementsUpdated(root)
+        }
+    }
+}
