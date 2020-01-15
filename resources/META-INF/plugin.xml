@@ -22,10 +22,9 @@
   -->
 
 <idea-plugin>
-    <id>com.melabsinthiatum.kotlin-mpp-shared-items-browser</id>
+    <id>melabsinthiatum.kotlin-mpp-shared-items-browser</id>
     <name>Kotlin MPP Shared Items Browser</name>
     <vendor email="mel.absinthiatum@gmail.com">MelAbsinthiatum</vendor>
-
 
     <depends>org.jetbrains.kotlin</depends>
     <depends>com.intellij.modules.lang</depends>
