@@ -60,6 +60,21 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
 }
 
+sourceSets {
+    main {
+        withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
+            listOf(java, kotlin).forEach { it.srcDirs("main") }
+        }
+        resources.srcDir("resources")
+    }
+
+    test {
+        withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
+            listOf(java, kotlin).forEach { it.srcDirs("test") }
+        }
+        resources.srcDir("resources")
+    }
+}
 
 
 fun htmlFixer(filename: String): String {
@@ -73,8 +88,8 @@ fun htmlFixer(filename: String): String {
 
 tasks {
     named<PatchPluginXmlTask>("patchPluginXml") {
-        changeNotes(htmlFixer("src/main/resources/META-INF/change-notes.html"))
-        pluginDescription(htmlFixer("src/main/resources/META-INF/description.html"))
+        changeNotes(htmlFixer("resources/META-INF/change-notes.html"))
+        pluginDescription(htmlFixer("resources/META-INF/description.html"))
         sinceBuild("191")
     }
 

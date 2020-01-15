@@ -38,15 +38,15 @@ class CustomIcons {
 
     class Nodes {
         companion object {
-            val Root = AllIcons.Nodes.Folder ?: load("com/melabsinthiatum/file.png")
-            val File = load("com/melabsinthiatum/file.png")
-            val Annotation = load("com/melabsinthiatum/annotation.png")
-            val Property = load("com/melabsinthiatum/property.png")
-            val Function = load("com/melabsinthiatum/func.png")
-            val Class = load("com/melabsinthiatum/class.png")
-            val Object = load("com/melabsinthiatum/obj.png")
-            val Expect = load("com/melabsinthiatum/expect.png")
-            val Actual = load("com/melabsinthiatum/actual.png")
+            val Root = AllIcons.Nodes.Folder ?: load("/com/melabsinthiatum/file.png")
+            val File = load("/com/melabsinthiatum/file.png")
+            val Annotation = load("/com/melabsinthiatum/annotation.png")
+            val Property = load("/com/melabsinthiatum/property.png")
+            val Function = load("/com/melabsinthiatum/func.png")
+            val Class = load("/com/melabsinthiatum/class.png")
+            val Object = load("/com/melabsinthiatum/obj.png")
+            val Expect = load("/com/melabsinthiatum/expect.png")
+            val Actual = load("/com/melabsinthiatum/actual.png")
         }
     }
 
