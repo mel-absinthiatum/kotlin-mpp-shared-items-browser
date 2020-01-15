@@ -41,12 +41,4 @@
 
         <postStartupActivity implementation="com.melabsinthiatum.services.extensionPoints.CustomStartupActivity"/>
     </extensions>
-
-    <actions>
-        <action id="com.melabsinthiatum.actions.RefreshTreeAction" class="com.melabsinthiatum.actions.RefreshTreeAction"
-                text="Refresh"/>
-        <action id="com.melabsinthiatum.actions.TreeSettingsAction"
-                class="com.melabsinthiatum.actions.TreeSettingsAction" text="Tree Settings"
-                description="Shared elements tree settings"/>
-    </actions>
 </idea-plugin>

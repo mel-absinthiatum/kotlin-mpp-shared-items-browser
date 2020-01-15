@@ -23,7 +23,6 @@
 
 package com.melabsinthiatum.sharedElementsBrowser.toolWindow
 
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.*
@@ -32,6 +31,8 @@ import com.intellij.ui.AnActionButton
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.messages.MessageBusConnection
+import com.melabsinthiatum.actions.RefreshTreeAction
+import com.melabsinthiatum.actions.TreeSettingsAction
 import com.melabsinthiatum.model.nodes.RootNode
 import com.melabsinthiatum.model.nodes.model.NodeModel
 import com.melabsinthiatum.model.nodes.model.RootNodeModel
@@ -60,7 +61,7 @@ import javax.swing.tree.*
  * Also, the browser can perform updates by a predefined in the settings time interval.
  *
  * The tree updates only if the tool window is visible and any editor is focused.
-*/
+ */
 class SharedElementsBrowser(private val project: Project, private val toolWindow: ToolWindow) : Loggable {
 
     var content: JPanel
@@ -100,16 +101,10 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
     //
 
     private fun decorator(tree: Tree): ToolbarDecorator {
-        val refreshActionButton = AnActionButton.fromAction(
-            ActionManager.getInstance()
-                .getAction("com.melabsinthiatum.actions.RefreshTreeAction")
-        )
+        val refreshActionButton = AnActionButton.fromAction(RefreshTreeAction())
         refreshActionButton.templatePresentation.icon = CustomIcons.Actions.Refresh
 
-        val treeSettingsButton = AnActionButton.fromAction(
-            ActionManager.getInstance()
-                .getAction("com.melabsinthiatum.actions.TreeSettingsAction")
-        )
+        val treeSettingsButton = AnActionButton.fromAction(TreeSettingsAction())
         treeSettingsButton.templatePresentation.icon = CustomIcons.Actions.Settings
 
         return ToolbarDecorator.createDecorator(tree)
