@@ -33,7 +33,7 @@ intellij {
 }
 
 group 'mel.absinthiatum'
-version '1.0'
+version '0.1.1'
 
 
 repositories {
@@ -47,9 +47,13 @@ dependencies {
 }
 
 
-// See https://github.com/JetBrains/gradle-intellij-plugin/
-
 patchPluginXml {
     changeNotes """
-      Initial version"""
+      <ul>
+        <li>Make compatible with 2019.3 Intellij IDEA version</li>
+        <li>Fix compatibility problem with the common type shared modules filtration
+        </li>
+        <li>Get rid of direct access to presumably not resolved `AWTEventMonitor` entity
+        </li>
+        </ul>"""
 }
