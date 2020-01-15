@@ -45,11 +45,13 @@ hs_err_pid*
 .idea/**/dbnavigator.xml
 
 # Gradle
-!/gradle/wrapper/gradle-wrapper.jar*.war
+!/gradle/wrapper/gradle-wrapper.jar*
+.war
 .idea/**/gradle.xml
 .idea/**/libraries
 .gradle
 /build/
+gradle.properties
 
 # Gradle and Maven with auto-import
 .idea/artifacts

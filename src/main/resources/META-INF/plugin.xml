@@ -22,14 +22,10 @@
   -->
 
 <idea-plugin>
-    <id>melabsinthiatum.kotlin-mpp-shared-items-browser</id>
-    <name>Kotlin MPP shared items browser</name>
+    <id>com.melabsinthiatum.kotlin-mpp-shared-items-browser</id>
+    <name>Kotlin MPP Shared Items Browser</name>
     <vendor email="mel.absinthiatum@gmail.com">MelAbsinthiatum</vendor>
-    <idea-version since-build="191"/>
 
-    <description>The Intellij IDEA plugin displaying an expect-actual elements tree with navigation to these items in
-        code by click.
-    </description>
 
     <depends>org.jetbrains.kotlin</depends>
     <depends>com.intellij.modules.lang</depends>
