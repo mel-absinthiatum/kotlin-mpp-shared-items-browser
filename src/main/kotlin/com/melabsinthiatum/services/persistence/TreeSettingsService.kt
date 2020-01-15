@@ -31,7 +31,7 @@ import com.melabsinthiatum.services.extensionPoints.SharedElementsTreeSettingsNo
 
 /**
  * <code>TreeSettingsComponent</code> is a persistent store service
- * for Shared Elements Browser settings. Еhese settings are currently common
+ * for Shared Elements Browser settings. These settings are currently common
  * to the entire application.
  */
 @State(
