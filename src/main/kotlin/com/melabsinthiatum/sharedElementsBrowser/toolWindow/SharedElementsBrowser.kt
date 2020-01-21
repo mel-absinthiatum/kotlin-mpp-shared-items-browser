@@ -52,7 +52,6 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.tree.*
 
-
 /**
  * <code>SharedElementsBrowser</code> is a tool window content panel containing
  * a shared elements tree providing the ability to navigate to objects as well
@@ -117,7 +116,7 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
     private fun configureSharedElementsTree() {
         sharedElementsTree.run {
             isRootVisible = false
-            selectionModel.selectionMode = TreeSelectionModel.SINGLE_TREE_SELECTION
+            selectionModel.selectionMode = TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION
             cellRenderer = SharedElementsTreeCellRenderer(sharedElementsTree)
             addKeyListener(SharedElementsTreeKeyListener(this, elementsSelectionHandler))
             addMouseListener(SharedElementsTreeMouseListener(this, elementsSelectionHandler))

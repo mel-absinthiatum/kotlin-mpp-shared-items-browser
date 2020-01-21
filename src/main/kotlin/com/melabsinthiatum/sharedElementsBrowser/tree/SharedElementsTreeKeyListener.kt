@@ -31,17 +31,13 @@ import javax.swing.tree.DefaultMutableTreeNode
 class SharedElementsTreeKeyListener(
     private val tree: Tree,
     private val selectionHandler: SharedElementsTreeSelectionHandlerInterface
-): KeyAdapter() {
+) : KeyAdapter() {
     override fun keyTyped(e: KeyEvent?) {
         if (e?.keyCode != KeyEvent.VK_ENTER) {
             return
         }
-
-        val treePath = tree.selectionPath
-        val node = treePath?.lastPathComponent as? DefaultMutableTreeNode
-
-        node?.let {
-            selectionHandler.nodeSelected(it)
-        }
+        val selectedNodes =
+            tree.getSelectedNodes(DefaultMutableTreeNode::class.java, null).mapNotNull { it }
+        selectionHandler.nodesSelected(selectedNodes)
     }
 }

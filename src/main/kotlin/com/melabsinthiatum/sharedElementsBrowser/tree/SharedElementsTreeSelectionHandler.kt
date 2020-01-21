@@ -27,19 +27,20 @@ import com.melabsinthiatum.sharedElementsBrowser.editor.SharedElementsNavigation
 import javax.swing.tree.DefaultMutableTreeNode
 
 /**
- * SharedElementsTreeSelectionHandlerInterface is used for handling item selection,
- * performed by `enter` key and mouse double-click.
+ * SharedElementsTreeSelectionHandlerInterface is used for handling one or multiple items selection,
+ * performed by pressing `enter` key with selected nodes set or mouse double-click on one node.
  *
  * @see SharedElementsTreeKeyListener
  * @see SharedElementsTreeMouseListener
  */
 interface SharedElementsTreeSelectionHandlerInterface {
     fun nodeSelected(node: DefaultMutableTreeNode)
+    fun nodesSelected(nodes: List<DefaultMutableTreeNode>)
 }
 
 /**
- * Default SharedElementsTreeSelectionHandler passes the selected node to the
- * navigation manager for displaying the selected element in a code editor.
+ * Default SharedElementsTreeSelectionHandler passes selected nodes to the navigation manager
+ * for displaying selected elements in code editors.
  *
  * @see SharedElementsNavigationManagerInterface
  */
@@ -47,5 +48,9 @@ class SharedElementsTreeSelectionHandler(private val navigationManager: SharedEl
     SharedElementsTreeSelectionHandlerInterface {
     override fun nodeSelected(node: DefaultMutableTreeNode) {
         navigationManager.navigate(node)
+    }
+
+    override fun nodesSelected(nodes: List<DefaultMutableTreeNode>) {
+        navigationManager.navigate(nodes)
     }
 }

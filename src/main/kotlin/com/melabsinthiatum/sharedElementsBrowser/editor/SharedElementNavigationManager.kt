@@ -39,11 +39,12 @@ import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import javax.swing.tree.DefaultMutableTreeNode
 
 /**
- * SharedElementNavigationManager allows to open the selected shared element in editor.
- * You can configure the logic for optional focusing editor and element highlighting.
+ * SharedElementNavigationManager allows to open selected shared elements in code editors.
+ * You can configure the logic for an optional editor focusing and element highlighting.
  */
 interface SharedElementsNavigationManagerInterface {
     fun navigate(node: DefaultMutableTreeNode)
+    fun navigate(nodes: List<DefaultMutableTreeNode>)
 }
 
 class SharedElementNavigationManager(
@@ -64,11 +65,15 @@ class SharedElementNavigationManager(
             }
         }
     }
+
+    override fun navigate(nodes: List<DefaultMutableTreeNode>) {
+        nodes.forEach { navigate(it) }
+    }
 }
 
 private fun Editor.highlightOnce(startOffset: Int, endOffset: Int) {
     val attributes = EditorColorsManager.getInstance().globalScheme.getAttributes(
-        EditorColors.SEARCH_RESULT_ATTRIBUTES
+        EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES
     )
 
     val outHighlighters = mutableListOf<RangeHighlighter>()
