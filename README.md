@@ -9,4 +9,7 @@ Plugin for Intellij IDEA and Android Studio, providing a tree of shared (expect/
 * Updates by using a button and by a timer, if the plugin tool window is visible and there is an active editor.
 * Allows to set the update interval. The settings are stored persistently.
 
-![kotlin-mpp-browser_navigation-demo](https://user-images.githubusercontent.com/56015356/72837240-bd90eb00-3cc0-11ea-9db6-cd0a080f6f63.gif)
+<br>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/56015356/72837240-bd90eb00-3cc0-11ea-9db6-cd0a080f6f63.gif">
+</p>
