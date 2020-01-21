@@ -30,7 +30,6 @@ import java.awt.Component
 import java.awt.event.KeyEvent
 import javax.swing.*
 
-
 /**
  * <code>SharedElementsTreeSettingsViewWrapper</code> is a dialog window
  * for Shared Elements Browser settings.

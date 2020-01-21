@@ -23,32 +23,29 @@
 
 package com.melabsinthiatum.sharedElementsBrowser.tree
 
-import com.intellij.ui.JBDefaultTreeCellRenderer
-import com.intellij.ui.components.JBLabel
-import com.melabsinthiatum.model.nodes.model.NodeModel
-import java.awt.Component
-import javax.swing.Icon
-import javax.swing.JTree
+import com.melabsinthiatum.sharedElementsBrowser.editor.SharedElementsNavigationManagerInterface
 import javax.swing.tree.DefaultMutableTreeNode
 
-class SharedElementsTreeCellRenderer(tree: JTree) : JBDefaultTreeCellRenderer(tree) {
+/**
+ * SharedElementsTreeSelectionHandlerInterface is used for handling item selection,
+ * performed by `enter` key and mouse double-click.
+ *
+ * @see SharedElementsTreeKeyListener
+ * @see SharedElementsTreeMouseListener
+ */
+interface SharedElementsTreeSelectionHandlerInterface {
+    fun nodeSelected(node: DefaultMutableTreeNode)
+}
 
-    override fun getTreeCellRendererComponent(
-        tree: JTree?, value: Any?, sel: Boolean, expanded: Boolean,
-        leaf: Boolean, row: Int, hasFocus: Boolean
-    ): Component {
-        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)
-
-        val defaultNode = value as? DefaultMutableTreeNode
-        val model = defaultNode?.userObject as? NodeModel ?: return this
-
-        return makeComponent(model.getLabelText(), model.getIcon())
-    }
-
-    private fun makeComponent(title: String, icon: Icon?): JBLabel {
-        val label = JBLabel()
-        label.text = title
-        label.icon = icon
-        return label
+/**
+ * Default SharedElementsTreeSelectionHandler passes the selected node to the
+ * navigation manager for displaying the selected element in a code editor.
+ *
+ * @see SharedElementsNavigationManagerInterface
+ */
+class SharedElementsTreeSelectionHandler(private val navigationManager: SharedElementsNavigationManagerInterface) :
+    SharedElementsTreeSelectionHandlerInterface {
+    override fun nodeSelected(node: DefaultMutableTreeNode) {
+        navigationManager.navigate(node)
     }
 }

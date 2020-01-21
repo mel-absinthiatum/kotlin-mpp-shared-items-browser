@@ -23,32 +23,25 @@
 
 package com.melabsinthiatum.sharedElementsBrowser.tree
 
-import com.intellij.ui.JBDefaultTreeCellRenderer
-import com.intellij.ui.components.JBLabel
-import com.melabsinthiatum.model.nodes.model.NodeModel
-import java.awt.Component
-import javax.swing.Icon
-import javax.swing.JTree
+import com.intellij.ui.treeStructure.Tree
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import javax.swing.tree.DefaultMutableTreeNode
 
-class SharedElementsTreeCellRenderer(tree: JTree) : JBDefaultTreeCellRenderer(tree) {
+class SharedElementsTreeKeyListener(
+    private val tree: Tree,
+    private val selectionHandler: SharedElementsTreeSelectionHandlerInterface
+): KeyAdapter() {
+    override fun keyTyped(e: KeyEvent?) {
+        if (e?.keyCode != KeyEvent.VK_ENTER) {
+            return
+        }
 
-    override fun getTreeCellRendererComponent(
-        tree: JTree?, value: Any?, sel: Boolean, expanded: Boolean,
-        leaf: Boolean, row: Int, hasFocus: Boolean
-    ): Component {
-        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)
+        val treePath = tree.selectionPath
+        val node = treePath?.lastPathComponent as? DefaultMutableTreeNode
 
-        val defaultNode = value as? DefaultMutableTreeNode
-        val model = defaultNode?.userObject as? NodeModel ?: return this
-
-        return makeComponent(model.getLabelText(), model.getIcon())
-    }
-
-    private fun makeComponent(title: String, icon: Icon?): JBLabel {
-        val label = JBLabel()
-        label.text = title
-        label.icon = icon
-        return label
+        node?.let {
+            selectionHandler.nodeSelected(it)
+        }
     }
 }

@@ -44,8 +44,8 @@ import com.melabsinthiatum.services.logging.logger
 import com.melabsinthiatum.services.persistence.TreeSettingsComponent
 import com.melabsinthiatum.sharedElements.SharedElementsUpdateManager
 import com.melabsinthiatum.sharedElements.diff.*
-import com.melabsinthiatum.sharedElementsBrowser.tree.SharedElementsSelectionListener
-import com.melabsinthiatum.sharedElementsBrowser.tree.SharedElementsTreeCellRenderer
+import com.melabsinthiatum.sharedElementsBrowser.editor.SharedElementNavigationManager
+import com.melabsinthiatum.sharedElementsBrowser.tree.*
 import kotlinx.coroutines.*
 import java.util.*
 import javax.swing.JPanel
@@ -70,12 +70,12 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
     private val sharedElementsTree: Tree
     private var treeRoot: DefaultMutableTreeNode = DefaultMutableTreeNode(RootNodeModel(project.name))
     private val treeModel: DefaultTreeModel
-    private val updateManager =
-        SharedElementsUpdateManager
+    private val updateManager = SharedElementsUpdateManager
     private val diffManager = TreeDiffManager
     private var updateJob: Job? = null
     private var updateInterval: Long
     private var msgBus = project.messageBus.connect(project)
+    private val elementsSelectionHandler = SharedElementsTreeSelectionHandler(SharedElementNavigationManager(project))
 
     init {
         logger.info("Tool window is created.")
@@ -119,7 +119,8 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
             isRootVisible = false
             selectionModel.selectionMode = TreeSelectionModel.SINGLE_TREE_SELECTION
             cellRenderer = SharedElementsTreeCellRenderer(sharedElementsTree)
-            addTreeSelectionListener(SharedElementsSelectionListener(project))
+            addKeyListener(SharedElementsTreeKeyListener(this, elementsSelectionHandler))
+            addMouseListener(SharedElementsTreeMouseListener(this, elementsSelectionHandler))
         }
     }
 

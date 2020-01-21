@@ -21,7 +21,7 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsBrowser.tree
+package com.melabsinthiatum.sharedElementsBrowser.editor
 
 import com.intellij.codeInsight.highlighting.HighlightManager
 import com.intellij.openapi.editor.Editor
@@ -36,31 +36,35 @@ import com.intellij.openapi.project.Project
 import com.melabsinthiatum.model.nodes.model.ExpectOrActualModelInterface
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
-import javax.swing.JTree
-import javax.swing.event.TreeSelectionEvent
-import javax.swing.event.TreeSelectionListener
 import javax.swing.tree.DefaultMutableTreeNode
 
-
-class SharedElementsSelectionListener(val project: Project) : TreeSelectionListener{
-    override fun valueChanged(event: TreeSelectionEvent?) {
-        val source = event?.source as? JTree
-
-        val node = source?.lastSelectedPathComponent as? DefaultMutableTreeNode
-        val nodeModel = node?.userObject as? ExpectOrActualModelInterface
-        val psi = nodeModel?.psi
-        val file = psi?.containingFile?.virtualFile
-
-        if (psi != null && file != null && file.isValid && !file.isDirectory) {
-            val fileEditorManager = FileEditorManager.getInstance(project)
-            fileEditorManager.openFile(file, true)
-            fileEditorManager.selectedTextEditor?.highlightOnce(psi.startOffset, psi.endOffset)
-        }
-
-        source?.clearSelection()
-    }
+/**
+ * SharedElementNavigationManager allows to open the selected shared element in editor.
+ * You can configure the logic for optional focusing editor and element highlighting.
+ */
+interface SharedElementsNavigationManagerInterface {
+    fun navigate(node: DefaultMutableTreeNode)
 }
 
+class SharedElementNavigationManager(
+    private val project: Project,
+    private val toFocusEditor: (ExpectOrActualModelInterface) -> Boolean = { false },
+    private val toHighlight: (ExpectOrActualModelInterface) -> Boolean = { true }
+) : SharedElementsNavigationManagerInterface {
+    override fun navigate(node: DefaultMutableTreeNode) {
+        val model = node.userObject as? ExpectOrActualModelInterface
+        val psi = model?.psi
+        val file = psi?.containingFile?.virtualFile
+
+        if (file != null && file.isValid && !file.isDirectory) {
+            val fileEditorManager = FileEditorManager.getInstance(project)
+            fileEditorManager.openFile(file, toFocusEditor(model))
+            if (toHighlight(model)) {
+                fileEditorManager.selectedTextEditor?.highlightOnce(psi.startOffset, psi.endOffset)
+            }
+        }
+    }
+}
 
 private fun Editor.highlightOnce(startOffset: Int, endOffset: Int) {
     val attributes = EditorColorsManager.getInstance().globalScheme.getAttributes(
@@ -85,8 +89,8 @@ private fun Editor.highlightOnce(startOffset: Int, endOffset: Int) {
 
     val caretModel = this.caretModel
     caretModel.primaryCaret.moveToOffset(startOffset)
-    val scrollingModel = this.scrollingModel
 
+    val scrollingModel = this.scrollingModel
     scrollingModel.scrollToCaret(ScrollType.CENTER_UP)
 }
 
