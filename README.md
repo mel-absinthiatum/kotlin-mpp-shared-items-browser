@@ -8,3 +8,5 @@ Plugin for Intellij IDEA and Android Studio, providing a tree of shared (expect/
 * Partially reloads the tree of elements by diffs, obtained when comparing _before_ and _after_ update trees.
 * Updates by using a button and by a timer, if the plugin tool window is visible and there is an active editor.
 * Allows to set the update interval. The settings are stored persistently.
+
+![kotlin-mpp-browser_navigation-demo](https://user-images.githubusercontent.com/56015356/72837240-bd90eb00-3cc0-11ea-9db6-cd0a080f6f63.gif)
