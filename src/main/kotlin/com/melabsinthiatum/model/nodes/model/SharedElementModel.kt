@@ -24,7 +24,6 @@
 package com.melabsinthiatum.model.nodes.model
 
 import com.melabsinthiatum.model.DeclarationType
-import com.melabsinthiatum.services.imageManager.CustomIcons
 import javax.swing.Icon
 
 
@@ -36,23 +35,18 @@ import javax.swing.Icon
 interface SharedElementModelInterface {
     val name: String?
     val type: DeclarationType
+    val typeIcon: Icon?
 }
 
 data class SharedElementModel(
     override val name: String?,
-    override val type: DeclarationType
+    override val type: DeclarationType,
+    override val typeIcon: Icon?
 ) : SharedElementModelInterface, NodeModel {
 
     override fun getLabelText(): String {
         return name ?: "#error"
     }
 
-    override fun getIcon(): Icon? = when (type) {
-        DeclarationType.ANNOTATION -> CustomIcons.Nodes.Annotation
-        DeclarationType.CLASS -> CustomIcons.Nodes.Class
-        DeclarationType.OBJECT -> CustomIcons.Nodes.Object
-        DeclarationType.PROPERTY -> CustomIcons.Nodes.Property
-        DeclarationType.NAMED_FUNCTION -> CustomIcons.Nodes.Function
-        DeclarationType.UNRESOLVED -> null
-    }
+    override fun getIcon(): Icon? = typeIcon
 }

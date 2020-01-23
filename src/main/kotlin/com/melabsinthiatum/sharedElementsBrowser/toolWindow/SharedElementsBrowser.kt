@@ -192,7 +192,6 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
             val mutatedChildNode = it as? DefaultMutableTreeNode ?: return@forEach
             val mutatedChildModel = mutatedChildNode.userObject as? TreeDiffManager.DiffNodeModel<*> ?: return@forEach
             for (sourceChild in sourceNodeChildren) {
-
                 if (sourceChild.userObject == mutatedChildModel.sourceNodeModel) {
                     updateTree(sourceChild, mutatedChildNode)
                     break

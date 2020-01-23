@@ -25,6 +25,7 @@ package com.melabsinthiatum.sharedElements
 
 import com.intellij.openapi.project.DumbServiceImpl
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Iconable.ICON_FLAG_READ_STATUS
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.psi.*
 import com.melabsinthiatum.model.DeclarationType
@@ -187,15 +188,15 @@ class SharedTreeProvider {
 
     private fun makeActualNodesForElement(element: KtDeclaration): List<ExpectOrActualNode> =
         element.actualsForExpected().mapNotNull {
-                makeExpectOrActualNode(element, SharedType.ACTUAL)
-            }
+            makeExpectOrActualNode(it, SharedType.ACTUAL)
+        }
 
     private fun makeExpectOrActualNode(element: KtDeclaration, type: SharedType): ExpectOrActualNode? {
         if (element.name == null) {
             assert(false) { "Empty element name." }
             return null
         }
-        val model = ExpectOrActualModel(element.name!!, lightenPsi(element) ?: element, type)
+        val model = ExpectOrActualModel(element.name!!, /*lightenPsi(element) ?:*/ element, type)
         return ExpectOrActualNode(model)
     }
 
@@ -216,22 +217,31 @@ class SharedTreeProvider {
     //
 
     private fun registerAnnotation(annotationClass: KtClass): SharedElementNode {
-        val model = SharedElementModel(annotationClass.name, DeclarationType.ANNOTATION)
+        val model = SharedElementModel(
+            annotationClass.name,
+            DeclarationType.ANNOTATION,
+            annotationClass.getIcon(ICON_FLAG_READ_STATUS)
+        )
         return SharedElementNode(model)
     }
 
     private fun registerProperty(property: KtProperty): SharedElementNode {
-        val model = SharedElementModel(property.name, DeclarationType.PROPERTY)
+        val model = SharedElementModel(property.name, DeclarationType.PROPERTY, property.getIcon(ICON_FLAG_READ_STATUS))
         return SharedElementNode(model)
     }
 
     private fun registerNamedFunction(function: KtNamedFunction): SharedElementNode {
-        val model = SharedElementModel(function.name, DeclarationType.NAMED_FUNCTION)
+        val model =
+            SharedElementModel(function.name, DeclarationType.NAMED_FUNCTION, function.getIcon(ICON_FLAG_READ_STATUS))
         return SharedElementNode(model)
     }
 
     private fun registerClass(classDeclaration: KtClass): SharedElementNode {
-        val model = SharedElementModel(classDeclaration.name, DeclarationType.CLASS)
+        val model = SharedElementModel(
+            classDeclaration.name,
+            DeclarationType.CLASS,
+            classDeclaration.getIcon(ICON_FLAG_READ_STATUS)
+        )
 
         val node = SharedElementNode(model)
 
@@ -246,7 +256,11 @@ class SharedTreeProvider {
     }
 
     private fun registerObject(objectDeclaration: KtObjectDeclaration): SharedElementNode {
-        val model = SharedElementModel(objectDeclaration.name, DeclarationType.OBJECT)
+        val model = SharedElementModel(
+            objectDeclaration.name,
+            DeclarationType.OBJECT,
+            objectDeclaration.getIcon(ICON_FLAG_READ_STATUS)
+        )
 
         val node = SharedElementNode(model)
 
