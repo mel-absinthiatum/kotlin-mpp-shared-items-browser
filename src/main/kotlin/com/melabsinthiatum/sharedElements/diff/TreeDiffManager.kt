@@ -1,7 +1,7 @@
 package com.melabsinthiatum.sharedElements.diff
 
+import kotlinx.coroutines.runBlocking
 import javax.swing.tree.DefaultMutableTreeNode
-
 
 /**
  * <code>TreeDiffManager</code> provides a hierarchical object (diff-tree) representing
@@ -38,9 +38,10 @@ object TreeDiffManager {
      * @return      a diff-tree represented by the tree constructed of DefaultMutableTreeNode-s
      *              with associated DiffNodeModel objects as default node userObject-s
      */
-    fun makeMutationsTree(oldNode: DefaultMutableTreeNode, newNode: DefaultMutableTreeNode): DefaultMutableTreeNode? {
-        return makeMutationsNode(oldNode,newNode)
-    }
+    fun makeMutationsTree(oldNode: DefaultMutableTreeNode, newNode: DefaultMutableTreeNode): DefaultMutableTreeNode? =
+        runBlocking {
+            makeMutationsNode(oldNode, newNode)
+        }
 
 
     //

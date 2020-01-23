@@ -23,6 +23,7 @@
 
 package com.melabsinthiatum.sharedElementsBrowser.toolWindow
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.*
@@ -72,7 +73,7 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
     private val updateManager = SharedElementsUpdateManager
     private val diffManager = TreeDiffManager
     private var updateJob: Job? = null
-    private var updateInterval: Long
+    private var reloadInterval: Long
     private var msgBus = project.messageBus.connect(project)
     private val elementsSelectionHandler = SharedElementsTreeSelectionHandler(SharedElementNavigationManager(project))
 
@@ -90,10 +91,13 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
         subscribe(msgBus)
 
         val service = ServiceManager.getService(TreeSettingsComponent::class.java)
-        updateInterval = service?.state?.reloadInterval ?: 10
-        updateJob = runRepeatingUpdates(repeatMillis = updateInterval * 1000)
-    }
+        reloadInterval = service?.state?.reloadInterval ?: 10
 
+        val myBus = ApplicationManager.getApplication().messageBus
+        val publisher: SharedElementsTreeSettingsNotifier =
+            myBus.syncPublisher(SharedElementsTopics.SHARED_ELEMENTS_TREE_SETTINGS_TOPIC)
+        publisher.reloadIntervalUpdated(reloadInterval, reloadInterval)
+    }
 
     //
     //  Initial configuration
@@ -161,6 +165,16 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
     }
 
     private fun runUpdate() {
+        // DEBUG
+//        Notifications.Bus.notify(
+//            Notification(
+//                "com.melabsinthiatum.tree_reload_debug_notification",
+//                "update ${Calendar.getInstance().time}",
+//                "interval $reloadInterval",
+//                NotificationType.INFORMATION
+//            )
+//        )
+
         val isAnyFocusedEditor = FileEditorManager.getInstance(project).selectedEditors.any { editor ->
             val window = SwingUtilities.getWindowAncestor(editor.component)
             window != null && window.isFocused
@@ -223,18 +237,19 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
             sharedElementsTree.expandPath(path)
         }
     }
+
+    private fun startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long = 0, action: () -> Unit) =
+        GlobalScope.launch {
+            delay(delayMillis)
+            if (repeatMillis > 0) {
+                while (isActive) {
+                    action()
+                    delay(repeatMillis)
+                }
+            } else {
+                action()
+            }
+        }
 }
 
 
-private fun startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long = 0, action: () -> Unit) =
-    GlobalScope.launch {
-        delay(delayMillis)
-        if (repeatMillis > 0) {
-            while (isActive) {
-                action()
-                delay(repeatMillis)
-            }
-        } else {
-            action()
-        }
-    }

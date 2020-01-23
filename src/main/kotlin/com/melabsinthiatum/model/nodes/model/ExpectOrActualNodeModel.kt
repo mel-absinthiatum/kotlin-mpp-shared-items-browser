@@ -23,6 +23,7 @@
 
 package com.melabsinthiatum.model.nodes.model
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiElement
 import com.melabsinthiatum.model.SharedType
 import com.melabsinthiatum.services.imageManager.CustomIcons
@@ -37,7 +38,6 @@ import javax.swing.Icon
  */
 interface ExpectOrActualModelInterface : NodeModel {
     val name: String
-    // TODO PsiNameIdentifierOwner
     val psi: PsiElement
     val type: SharedType
 }
@@ -47,9 +47,22 @@ data class ExpectOrActualModel(
     override val psi: PsiElement,
     override val type: SharedType
 ) : ExpectOrActualModelInterface {
+
+    private val moduleNameWithDefault: (String) -> String = { default ->
+        var moduleName: String? = null
+        ApplicationManager.getApplication().runReadAction {
+            moduleName = try {
+                psi.module?.name
+            } catch (e: com.intellij.psi.PsiInvalidElementAccessException) {
+                null
+            }
+        }
+        moduleName ?: default
+    }
+
     override fun getLabelText(): String = when (type) {
-        SharedType.EXPECT -> psi.module?.name ?: "Common"
-        SharedType.ACTUAL -> psi.module?.name ?: "Actual"
+        SharedType.EXPECT -> moduleNameWithDefault("Common module")
+        SharedType.ACTUAL -> moduleNameWithDefault("Actual module")
     }
 
     override fun getIcon(): Icon? = when (type) {

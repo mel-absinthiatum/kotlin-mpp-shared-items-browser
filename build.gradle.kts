@@ -58,6 +58,7 @@ dependencies {
     testCompile(kotlin(module = "test-junit"))
     testCompile(group = "junit", name = "junit", version = "4.12")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.3.3")
 }
 
 sourceSets {

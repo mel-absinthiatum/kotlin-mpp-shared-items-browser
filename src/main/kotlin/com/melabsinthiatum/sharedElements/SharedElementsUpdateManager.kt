@@ -29,7 +29,6 @@ import com.melabsinthiatum.services.extensionPoints.SharedElementsTopicsNotifier
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-
 /**
  * <code>SharedElementsUpdateManager</code> updates shared elements tree
  * and notifies when completed using the <code>SHARED_ELEMENTS_TREE_TOPIC</code>

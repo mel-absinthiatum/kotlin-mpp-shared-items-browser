@@ -35,8 +35,6 @@ import com.melabsinthiatum.model.modulesRoutines.MppAuthorityZonesManager
 import com.melabsinthiatum.model.nodes.*
 import com.melabsinthiatum.model.nodes.model.*
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.kotlin.asJava.toLightAnnotation
-import org.jetbrains.kotlin.asJava.toLightClass
 import org.jetbrains.kotlin.idea.util.*
 import org.jetbrains.kotlin.psi.*
 import kotlin.coroutines.resume
@@ -196,19 +194,8 @@ class SharedTreeProvider {
             assert(false) { "Empty element name." }
             return null
         }
-        val model = ExpectOrActualModel(element.name!!, /*lightenPsi(element) ?:*/ element, type)
+        val model = ExpectOrActualModel(element.name!!, element, type)
         return ExpectOrActualNode(model)
-    }
-
-    private fun lightenPsi(originalElement: PsiElement): PsiElement? = when (originalElement) {
-        is KtClassOrObject -> {
-            if (originalElement.isAnnotation()) {
-                originalElement.toLightAnnotation()
-            } else {
-                originalElement.toLightClass()
-            }
-        }
-        else -> originalElement
     }
 
 
