@@ -2,9 +2,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # kotlin-mpp-shared-items-browser
+Plugin for Intellij IDEA and Android Studio, providing a tree of shared (expect/actual) project elements
 
-Plugin for Intellij IDEA and Android Studio, providing a tree of shared (expect/actual) project elements:
+## Plugin page
+[JetBrains Plugin Repository](https://plugins.jetbrains.com/plugin/13652-kotlin-mpp-shared-items-browser/)
 
+## Features
+Kotlin MPP Shared Items Browser: 
 * Builds the tree of shared elements in a special tool window with types indication, lists  places of common `expect` and platform `actual` element’s declarations.
 * Includes hierarchic displaying of nested shared elements.
 * Provides navigation to elements (opening the editor, scrolling to position in code, highlighting).
@@ -14,9 +18,7 @@ Plugin for Intellij IDEA and Android Studio, providing a tree of shared (expect/
 
 <br>
 
-![kotlin-mpp-browser_navigation-demo](https://user-images.githubusercontent.com/56015356/72837240-bd90eb00-3cc0-11ea-9db6-cd0a080f6f63.gif)
-
+![demo](https://user-images.githubusercontent.com/56015356/73127710-29dc5900-3ff7-11ea-8bc6-c82fe6bda0ed.gif)
 
 ## Installation
-
 The plugin can be installed with **Settings | Plugins | Browse Repositories** and no further set up is required.

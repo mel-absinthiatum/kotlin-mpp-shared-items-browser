@@ -25,7 +25,7 @@ import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.intellij.tasks.PublishTask
 
 group = "com.melabsinthiatum"
-version = "0.1.2"
+version = "1.0.0"
 
 buildscript {
     repositories { mavenCentral() }
