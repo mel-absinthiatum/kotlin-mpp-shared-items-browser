@@ -34,6 +34,8 @@ import com.melabsinthiatum.model.modulesRoutines.MppAuthorityZonesManager
 import com.melabsinthiatum.model.nodes.*
 import com.melabsinthiatum.model.nodes.model.*
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.kotlin.asJava.toLightAnnotation
+import org.jetbrains.kotlin.asJava.toLightClass
 import org.jetbrains.kotlin.idea.util.*
 import org.jetbrains.kotlin.psi.*
 import kotlin.coroutines.resume
@@ -134,8 +136,7 @@ class SharedTreeProvider {
         val list = mutableListOf<SharedElementNode>()
         element.acceptChildren(
             namedDeclarationVisitor { declaration ->
-                val node = makeElementNode(declaration) ?: return@namedDeclarationVisitor
-                list.add(node)
+                makeElementNode(declaration)?.let { node -> list.add(node) }
             })
         return list
     }
@@ -145,8 +146,7 @@ class SharedTreeProvider {
         element.forEach {
             it.accept(
                 namedDeclarationVisitor { declaration ->
-                    val node = makeElementNode(declaration) ?: return@namedDeclarationVisitor
-                    list.add(node)
+                    makeElementNode(declaration)?.let { node -> list.add(node) }
                 })
         }
         return list
@@ -182,25 +182,32 @@ class SharedTreeProvider {
     }
 
     private fun makeExpectNodeForElement(element: KtDeclaration): ExpectOrActualNode? {
+        return makeExpectOrActualNode(element, SharedType.EXPECT)
+    }
+
+    private fun makeActualNodesForElement(element: KtDeclaration): List<ExpectOrActualNode> =
+        element.actualsForExpected().mapNotNull {
+                makeExpectOrActualNode(element, SharedType.ACTUAL)
+            }
+
+    private fun makeExpectOrActualNode(element: KtDeclaration, type: SharedType): ExpectOrActualNode? {
         if (element.name == null) {
             assert(false) { "Empty element name." }
             return null
         }
-        val model = ExpectOrActualModel(element.name!!, element, SharedType.EXPECTED)
+        val model = ExpectOrActualModel(element.name!!, lightenPsi(element) ?: element, type)
         return ExpectOrActualNode(model)
     }
 
-    private fun makeActualNodesForElement(element: KtDeclaration): List<ExpectOrActualNode> {
-        val actuals = element.actualsForExpected()
-        return actuals.mapNotNull {
-            if (it.name == null) {
-                assert(false) { "Empty element name." }
-                null
+    private fun lightenPsi(originalElement: PsiElement): PsiElement? = when (originalElement) {
+        is KtClassOrObject -> {
+            if (originalElement.isAnnotation()) {
+                originalElement.toLightAnnotation()
             } else {
-                val model = ExpectOrActualModel(it.name!!, it, SharedType.ACTUAL)
-                ExpectOrActualNode(model)
+                originalElement.toLightClass()
             }
         }
+        else -> originalElement
     }
 
 
