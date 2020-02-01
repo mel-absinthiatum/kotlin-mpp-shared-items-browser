@@ -34,7 +34,6 @@ import com.melabsinthiatum.model.modulesRoutines.MppAuthorityZone
 import com.melabsinthiatum.model.modulesRoutines.MppAuthorityZonesManager
 import com.melabsinthiatum.model.nodes.*
 import com.melabsinthiatum.model.nodes.model.*
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.idea.util.*
 import org.jetbrains.kotlin.psi.*
 import kotlin.coroutines.resume
@@ -50,11 +49,9 @@ class SharedTreeProvider {
 
     suspend fun sharedTreeRoot(project: Project): RootNode = suspendCoroutine { cont ->
         DumbServiceImpl.getInstance(project).smartInvokeLater {
-            runBlocking {
-                val rootNode = RootNode(project.name)
-                rootNode.add(iterateAllZones(project))
-                cont.resume(rootNode)
-            }
+            val rootNode = RootNode(project.name)
+            rootNode.add(iterateAllZones(project))
+            cont.resume(rootNode)
         }
     }
 
@@ -92,9 +89,7 @@ class SharedTreeProvider {
 //                        }
 //                    }
 //                }
-//
 //            }
-
         }
     }
 

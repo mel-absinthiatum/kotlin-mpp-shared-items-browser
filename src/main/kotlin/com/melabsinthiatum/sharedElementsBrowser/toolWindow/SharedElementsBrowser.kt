@@ -77,6 +77,9 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
     private var msgBus = project.messageBus.connect(project)
     private val elementsSelectionHandler = SharedElementsTreeSelectionHandler(SharedElementNavigationManager(project))
 
+    // DEBUG
+    private fun log(msg: String) = println("[${Thread.currentThread().name}] $msg")
+
     init {
         logger.info("Tool window is created.")
 
