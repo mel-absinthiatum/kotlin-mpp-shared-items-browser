@@ -33,6 +33,7 @@ buildscript {
 }
 
 plugins {
+    id("java")
     id("org.jetbrains.intellij") version "0.4.15"
     kotlin("jvm") version "1.3.61"
 }
@@ -40,8 +41,8 @@ plugins {
 intellij {
     updateSinceUntilBuild = false
     instrumentCode = true
-    version = "2019.1"
-    setPlugins("Kotlin")
+    version = "2019.2"
+    setPlugins("java", "Kotlin")
 }
 
 java {
@@ -54,9 +55,9 @@ repositories {
 }
 
 dependencies {
-    compile(kotlin("stdlib-jdk8"))
-    testCompile(kotlin(module = "test-junit"))
-    testCompile(group = "junit", name = "junit", version = "4.12")
+    implementation(kotlin("stdlib-jdk8"))
+    testImplementation(kotlin(module = "test-junit"))
+    testImplementation(group = "junit", name = "junit", version = "4.12")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.3.3")
 }

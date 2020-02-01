@@ -243,7 +243,9 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
             delay(delayMillis)
             if (repeatMillis > 0) {
                 while (isActive) {
-                    action()
+                    launch(Dispatchers.Main) {
+                        action()
+                    }
                     delay(repeatMillis)
                 }
             } else {

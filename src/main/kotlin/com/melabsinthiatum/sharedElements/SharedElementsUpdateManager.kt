@@ -26,8 +26,7 @@ package com.melabsinthiatum.sharedElements
 import com.intellij.openapi.project.Project
 import com.melabsinthiatum.services.extensionPoints.SharedElementsTopics
 import com.melabsinthiatum.services.extensionPoints.SharedElementsTopicsNotifier
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * <code>SharedElementsUpdateManager</code> updates shared elements tree
@@ -37,10 +36,11 @@ object SharedElementsUpdateManager {
     fun update(project: Project) {
         GlobalScope.launch {
             val root = SharedTreeProvider().sharedTreeRoot(project)
-
-            val publisher: SharedElementsTopicsNotifier =
-                project.messageBus.syncPublisher(SharedElementsTopics.SHARED_ELEMENTS_TREE_TOPIC)
-            publisher.sharedElementsUpdated(root)
+            launch(Dispatchers.Main) {
+                val publisher: SharedElementsTopicsNotifier =
+                    project.messageBus.syncPublisher(SharedElementsTopics.SHARED_ELEMENTS_TREE_TOPIC)
+                publisher.sharedElementsUpdated(root)
+            }
         }
     }
 }

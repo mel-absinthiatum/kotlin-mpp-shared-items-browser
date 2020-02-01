@@ -28,7 +28,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 
 /**
  * SharedElementsTreeSelectionHandlerInterface is used for handling one or multiple items selection,
- * performed by pressing `enter` key with selected nodes set or mouse double-click on one node.
+ * performed by pressing the `enter` key with selected nodes set or mouse double-click on one node.
  *
  * @see SharedElementsTreeKeyListener
  * @see SharedElementsTreeMouseListener

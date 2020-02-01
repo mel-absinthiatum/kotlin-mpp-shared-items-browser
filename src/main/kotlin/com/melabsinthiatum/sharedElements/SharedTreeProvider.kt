@@ -185,8 +185,12 @@ class SharedTreeProvider {
     }
 
     private fun makeActualNodesForElement(element: KtDeclaration): List<ExpectOrActualNode> =
-        element.actualsForExpected().mapNotNull {
-            makeExpectOrActualNode(it, SharedType.ACTUAL)
+        try {
+            element.actualsForExpected().mapNotNull {
+                makeExpectOrActualNode(it, SharedType.ACTUAL)
+            }
+        } catch (e: Throwable) {
+            emptyList()
         }
 
     private fun makeExpectOrActualNode(element: KtDeclaration, type: SharedType): ExpectOrActualNode? {

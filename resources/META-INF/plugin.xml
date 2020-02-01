@@ -26,6 +26,7 @@
     <name>Kotlin MPP Shared Items Browser</name>
     <vendor email="mel.absinthiatum@gmail.com">MelAbsinthiatum</vendor>
 
+    <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.kotlin</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.platform</depends>
