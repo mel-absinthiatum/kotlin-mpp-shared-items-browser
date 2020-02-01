@@ -143,6 +143,7 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
                 val diffTree = diffManager.makeMutationsTree(oldNode = treeRoot, newNode = defaultRoot)
                 if (diffTree != null) {
                     updateTree(treeRoot, diffTree)
+                    reloadTree()
                 }
             }
         })
@@ -217,8 +218,6 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
         }
         val mutations = diffNodeModel.mutations
         mutations.forEach { handleMutation(sourceNode, it) }
-
-        reloadTree()
     }
 
     private fun handleMutation(node: DefaultMutableTreeNode, mutation: TreeMutation) {
