@@ -21,7 +21,7 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsBrowser.tree
+package com.melabsinthiatum.sharedElementsBrowser.toolWindow.tree
 
 import com.intellij.ui.JBDefaultTreeCellRenderer
 import com.intellij.ui.components.JBLabel

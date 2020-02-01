@@ -21,23 +21,28 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsBrowser.tree
+package com.melabsinthiatum.sharedElementsBrowser.toolWindow.tree
 
 import com.intellij.ui.treeStructure.Tree
-import java.awt.event.KeyAdapter
-import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.tree.DefaultMutableTreeNode
 
-class SharedElementsTreeKeyListener(
+class SharedElementsTreeMouseListener(
     private val tree: Tree,
     private val selectionHandler: SharedElementsTreeSelectionHandlerInterface
-) : KeyAdapter() {
-    override fun keyTyped(e: KeyEvent?) {
-        if (e?.keyCode != KeyEvent.VK_ENTER) {
+) : MouseAdapter() {
+    override fun mouseClicked(e: MouseEvent?) {
+        if (e == null) return
+        if (e.clickCount < 2) {
             return
         }
-        val selectedNodes =
-            tree.getSelectedNodes(DefaultMutableTreeNode::class.java, null).mapNotNull { it }
-        selectionHandler.nodesSelected(selectedNodes)
+
+        val treePath = tree.getPathForLocation(e.x, e.y)
+        val node = treePath?.lastPathComponent as? DefaultMutableTreeNode
+
+        node?.let {
+            selectionHandler.nodeSelected(it)
+        }
     }
 }

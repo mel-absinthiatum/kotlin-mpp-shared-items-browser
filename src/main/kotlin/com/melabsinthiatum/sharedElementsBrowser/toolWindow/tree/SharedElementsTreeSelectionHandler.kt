@@ -21,7 +21,7 @@
  *
  */
 
-package com.melabsinthiatum.sharedElementsBrowser.tree
+package com.melabsinthiatum.sharedElementsBrowser.toolWindow.tree
 
 import com.melabsinthiatum.sharedElementsBrowser.editor.SharedElementsNavigationManagerInterface
 import javax.swing.tree.DefaultMutableTreeNode

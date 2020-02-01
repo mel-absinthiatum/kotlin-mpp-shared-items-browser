@@ -46,7 +46,7 @@ import com.melabsinthiatum.services.persistence.TreeSettingsComponent
 import com.melabsinthiatum.sharedElements.SharedElementsUpdateManager
 import com.melabsinthiatum.sharedElements.diff.*
 import com.melabsinthiatum.sharedElementsBrowser.editor.SharedElementNavigationManager
-import com.melabsinthiatum.sharedElementsBrowser.tree.*
+import com.melabsinthiatum.sharedElementsBrowser.toolWindow.tree.*
 import kotlinx.coroutines.*
 import java.util.*
 import javax.swing.JPanel
