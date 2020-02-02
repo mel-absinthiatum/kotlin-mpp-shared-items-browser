@@ -53,17 +53,25 @@ fun Tree.expand(node: TreeNode, level: Int) {
 
 /**
  * Collapse all nodes of the tree.
+ *
+ * @param node  The node to collapse from.
  */
-fun Tree.collapseAll() {
-    for (i in 1 until this.rowCount) {
-        collapseRow(i)
+fun Tree.collapseAll(node: TreeNode) {
+    getPath(node)?.let { path ->
+        if (isRootVisible) {
+            collapseNode(node, path)
+        } else {
+            node.children().toList().filterIsInstance<TreeNode>().forEach { childNode ->
+                collapseNode(childNode, path.pathByAddingChild(childNode))
+            }
+        }
     }
 }
 
 /**
  * Collect paths of all expanded nodes of the tree.
  *
- * @return List of paths of expanded nodes.
+ * @return  List of paths of expanded nodes.
  */
 fun Tree.getExpandedPaths(): List<TreePath> {
     val expanded = ArrayList<TreePath>()
@@ -145,4 +153,17 @@ private fun Tree.expandNode(
         val childNode = node.getChildAt(i)
         expandNode(childNode, path.pathByAddingChild(childNode))
     }
+}
+
+/**
+ * Collapse all nodes of the tree starting from the given node and path.
+ *
+ * @param node  The node to start from.
+ * @param path  The path to start from.
+ */
+private fun Tree.collapseNode(node: TreeNode, path: TreePath) {
+    node.children().toList().filterIsInstance<TreeNode>().forEach { childNode ->
+        collapseNode(childNode, path.pathByAddingChild(childNode))
+    }
+    collapsePath(path)
 }

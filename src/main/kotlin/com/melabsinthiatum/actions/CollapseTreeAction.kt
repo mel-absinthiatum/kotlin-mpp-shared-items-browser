@@ -21,30 +21,22 @@
  *
  */
 
-package com.melabsinthiatum.services.extensionPoints
+package com.melabsinthiatum.actions
 
-import com.intellij.util.messages.Topic
-import com.melabsinthiatum.model.nodes.RootNode
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.melabsinthiatum.services.extensionPoints.SharedElementsTopics
+import com.melabsinthiatum.services.extensionPoints.SharedElementsTopicsNotifier
 
 /**
- * <code>SharedElementsTopics</code> contains custom Topics related to
- * Shared Elements Browser events.
- */
-class SharedElementsTopics {
-    companion object {
-        var SHARED_ELEMENTS_TREE_TOPIC: Topic<SharedElementsTopicsNotifier> =
-            Topic.create("custom name", SharedElementsTopicsNotifier::class.java)
-        var SHARED_ELEMENTS_TREE_SETTINGS_TOPIC: Topic<SharedElementsTreeSettingsNotifier> =
-            Topic.create("Shared elements tree settings notifier", SharedElementsTreeSettingsNotifier::class.java)
+ * <code>CollapseTreeAction</code> launch the collapsing of the shared element tree of
+* a specific project.
+*/
+class CollapseTreeAction : AnAction() {
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.project ?: return
+        val publisher: SharedElementsTopicsNotifier =
+            project.messageBus.syncPublisher(SharedElementsTopics.SHARED_ELEMENTS_TREE_TOPIC)
+        publisher.elementsTreeCollapse()
     }
-}
-
-interface SharedElementsTopicsNotifier {
-    fun sharedElementsUpdated(root: RootNode)
-    fun elementsTreeExpand()
-    fun elementsTreeCollapse()
-}
-
-interface SharedElementsTreeSettingsNotifier {
-    fun reloadIntervalUpdated(oldValue: Long, newValue: Long)
 }

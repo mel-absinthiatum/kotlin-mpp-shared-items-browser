@@ -153,6 +153,14 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
                     reloadTree()
                 }
             }
+
+            override fun elementsTreeExpand() {
+                sharedElementsTree.expandAll(treeRoot)
+            }
+
+            override fun elementsTreeCollapse() {
+                sharedElementsTree.collapseAll(treeRoot)
+            }
         })
 
         bus.subscribe(

@@ -51,6 +51,19 @@
                     icon="/actions/refresh.png"
             />
             <separator/>
+            <action id="com.melabsinthiatum.actions.ExpandTreeAction"
+                    class="com.melabsinthiatum.actions.ExpandTreeAction"
+                    text="Expand Tree"
+                    description="Expand tree"
+                    icon="/actions/expandall.svg"
+            />
+            <action id="com.melabsinthiatum.actions.CollapseTreeAction"
+                    class="com.melabsinthiatum.actions.CollapseTreeAction"
+                    text="Collapse Tree"
+                    description="Collapse tree"
+                    icon="/actions/collapseall.svg"
+            />
+            <separator/>
             <action id="com.melabsinthiatum.actions.TreeSettingsAction"
                     class="com.melabsinthiatum.actions.TreeSettingsAction"
                     text="Settings"
