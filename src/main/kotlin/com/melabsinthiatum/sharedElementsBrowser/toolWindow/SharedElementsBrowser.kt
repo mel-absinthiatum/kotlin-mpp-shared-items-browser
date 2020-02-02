@@ -48,7 +48,6 @@ import com.melabsinthiatum.sharedElements.diff.*
 import com.melabsinthiatum.sharedElementsBrowser.editor.SharedElementNavigationManager
 import com.melabsinthiatum.sharedElementsBrowser.toolWindow.tree.*
 import kotlinx.coroutines.*
-import java.util.*
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.tree.*
@@ -228,16 +227,9 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
     }
 
     private fun reloadTree() {
-        val expanded = ArrayList<TreePath>()
-        for (i in 0 until sharedElementsTree.rowCount) {
-            if (sharedElementsTree.isExpanded(i)) {
-                expanded.add(sharedElementsTree.getPathForRow(i))
-            }
-        }
+        val expanded = sharedElementsTree.getExpandedPaths()
         treeModel.reload()
-        for (path in expanded) {
-            sharedElementsTree.expandPath(path)
-        }
+        sharedElementsTree.expand(expanded)
     }
 
     private fun startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long = 0, action: () -> Unit) =

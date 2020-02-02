@@ -37,7 +37,8 @@
 
         <toolWindow id="Expect-Actual Interface" secondary="false" icon="/com/melabsinthiatum/shared_items_icon.svg"
                     anchor="right"
-                    factoryClass="com.melabsinthiatum.sharedElementsBrowser.toolWindow.SharedElementsToolWindowFactory" order="last"/>
+                    factoryClass="com.melabsinthiatum.sharedElementsBrowser.toolWindow.SharedElementsToolWindowFactory"
+                    order="last"/>
 
         <postStartupActivity implementation="com.melabsinthiatum.services.extensionPoints.CustomStartupActivity"/>
     </extensions>
