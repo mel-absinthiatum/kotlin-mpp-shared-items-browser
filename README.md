@@ -13,12 +13,12 @@ Kotlin MPP Shared Items Browser:
 * Includes hierarchic displaying of nested shared elements.
 * Provides navigation to elements (opening the editor, scrolling to position in code, highlighting).
 * Partially reloads the tree of elements by diffs, obtained when comparing _before_ and _after_ update trees.
-* Updates by using a button and by a timer, if the plugin tool window is visible and there is an active editor.
+* Updates by using a button and by a timer, if the plugin tool window is visible.
 * Allows to set the update interval. The settings are stored persistently.
 
 <br>
 
-![demo](https://user-images.githubusercontent.com/56015356/73127710-29dc5900-3ff7-11ea-8bc6-c82fe6bda0ed.gif)
+![plugin-demo](https://user-images.githubusercontent.com/56015356/73611818-5e17d100-4618-11ea-91bf-b43ecf4ab38e.gif)
 
 ## Installation
 The plugin can be installed with **Settings | Plugins | Browse Repositories** and no further set up is required.
