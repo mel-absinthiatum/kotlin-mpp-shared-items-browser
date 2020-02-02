@@ -25,7 +25,6 @@ package com.melabsinthiatum.model.nodes.model
 
 import javax.swing.Icon
 
-
 /**
  * <code>RootNodeModel</code> is a model for project root representation.
  * This node is typically invisible.

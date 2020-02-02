@@ -23,7 +23,6 @@
 
 package com.melabsinthiatum.model
 
-
 enum class SharedType {
     EXPECT, ACTUAL
 }

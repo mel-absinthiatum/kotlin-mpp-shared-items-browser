@@ -30,7 +30,6 @@ import com.melabsinthiatum.services.imageManager.CustomIcons
 import org.jetbrains.kotlin.idea.util.module
 import javax.swing.Icon
 
-
 /**
  * <code>ExpectOrActualModelInterface</code> is a model for Shared Elements Tree leaves.
  * This object provides the psi- and document-level info for a specific element

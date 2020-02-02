@@ -28,7 +28,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.melabsinthiatum.sharedElements.SharedElementsUpdateManager
 
 /**
- * <code>RefreshTreeAction</code> launches updating the shared element tree of
+ * <code>RefreshTreeAction</code> launch the updating the shared element tree of
  * a specific project.
  */
 class RefreshTreeAction : AnAction() {

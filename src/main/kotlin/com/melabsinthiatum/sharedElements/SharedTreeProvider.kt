@@ -39,7 +39,6 @@ import org.jetbrains.kotlin.psi.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-
 /**
  * <code>SharedTreeProvider</code> provides the shared elements tree for a specific project.
  */

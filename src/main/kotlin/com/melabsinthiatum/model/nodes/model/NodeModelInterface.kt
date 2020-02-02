@@ -25,7 +25,6 @@ package com.melabsinthiatum.model.nodes.model
 
 import javax.swing.Icon
 
-
 /**
  * <code>NodeModel</code> interface provides parameters necessary for tree cells rendering.
  */

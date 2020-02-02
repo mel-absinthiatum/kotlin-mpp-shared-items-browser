@@ -30,7 +30,6 @@ import org.jetbrains.kotlin.cli.common.arguments.K2MetadataCompilerArguments
 import org.jetbrains.kotlin.config.KotlinFacetSettingsProvider
 import org.jetbrains.kotlin.idea.caches.project.isMPPModule
 
-
 /**
  * @see MppAuthorityZone
  */

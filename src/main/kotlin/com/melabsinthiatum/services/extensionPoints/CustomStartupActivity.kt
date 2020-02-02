@@ -28,7 +28,6 @@ import com.intellij.openapi.startup.StartupActivity
 import com.melabsinthiatum.services.logging.Loggable
 import com.melabsinthiatum.services.logging.logger
 
-
 /**
  * <code>CustomStartupActivity</code> indicates an application start instant
  * and can be used for plugin initial configurations.

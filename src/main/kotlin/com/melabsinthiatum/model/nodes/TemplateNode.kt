@@ -29,7 +29,6 @@ import com.melabsinthiatum.model.nodes.utils.toEnumeration
 import java.util.*
 import javax.swing.tree.TreeNode
 
-
 /**
  * <code>TemplateNodeInterface</code> is a templated interface for custom
  * immutable tree building.
@@ -43,7 +42,6 @@ interface TemplateNodeInterface<M : NodeModel, C : CustomNodeInterface> : Custom
 
     fun add(newChildren: List<C>)
 }
-
 
 /**
  * <code>TemplateNode</code> is an abstract base class providing a universal
@@ -148,7 +146,6 @@ abstract class TemplateNode<M : NodeModel, C : CustomNodeInterface>(
     }
 }
 
-
 /**
  * <code>TemplateLeaf</code> is an abstract base class providing a universal
  * templated leaf node for custom immutable tree building.
@@ -182,7 +179,6 @@ abstract class TemplateLeaf<M : NodeModel>(model: M) : TemplateNode<M, Nothing>(
         return -1
     }
 }
-
 
 /**
  * <code>TemplateRootNode</code> is an abstract base class providing a universal

@@ -27,7 +27,6 @@ import com.melabsinthiatum.model.DeclarationType
 import com.melabsinthiatum.services.imageManager.CustomIcons
 import javax.swing.Icon
 
-
 /**
  * <code>SharedElementModelInterface</code> is a model for as such Shared Element
  * with its AST declaration type info. Below this element in the tree is a set of leaf elements

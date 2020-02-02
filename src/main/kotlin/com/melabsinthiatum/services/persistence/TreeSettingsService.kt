@@ -28,7 +28,6 @@ import com.intellij.openapi.components.*
 import com.melabsinthiatum.services.extensionPoints.SharedElementsTopics
 import com.melabsinthiatum.services.extensionPoints.SharedElementsTreeSettingsNotifier
 
-
 /**
  * <code>TreeSettingsComponent</code> is a persistent store service
  * for Shared Elements Browser settings. These settings are currently common

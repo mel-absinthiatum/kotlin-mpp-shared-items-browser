@@ -27,7 +27,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.melabsinthiatum.services.imageManager.CustomIcons
 import javax.swing.Icon
 
-
 /**
  * <code>FileNodeModelInterface</code> is a model for a plain file representation.
  */
@@ -35,7 +34,6 @@ interface FileNodeModelInterface : NodeModel {
     val title: String
     val virtualFile: VirtualFile
 }
-
 
 data class FileNodeModel(
     override val title: String,
