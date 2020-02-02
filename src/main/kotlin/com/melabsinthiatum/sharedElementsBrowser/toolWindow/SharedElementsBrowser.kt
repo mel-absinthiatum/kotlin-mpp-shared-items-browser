@@ -23,23 +23,21 @@
 
 package com.melabsinthiatum.sharedElementsBrowser.toolWindow
 
+import com.intellij.openapi.actionSystem.ActionGroup
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.*
 import com.intellij.openapi.wm.ToolWindow
-import com.intellij.ui.AnActionButton
-import com.intellij.ui.ToolbarDecorator
+import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.messages.MessageBusConnection
-import com.melabsinthiatum.actions.RefreshTreeAction
-import com.melabsinthiatum.actions.TreeSettingsAction
+import com.intellij.util.ui.JBUI
 import com.melabsinthiatum.model.nodes.RootNode
 import com.melabsinthiatum.model.nodes.model.NodeModel
 import com.melabsinthiatum.model.nodes.model.RootNodeModel
 import com.melabsinthiatum.model.nodes.toDefaultTree
 import com.melabsinthiatum.services.extensionPoints.*
-import com.melabsinthiatum.services.imageManager.CustomIcons
 import com.melabsinthiatum.services.logging.Loggable
 import com.melabsinthiatum.services.logging.logger
 import com.melabsinthiatum.services.persistence.TreeSettingsComponent
@@ -48,8 +46,9 @@ import com.melabsinthiatum.sharedElements.diff.*
 import com.melabsinthiatum.sharedElementsBrowser.editor.SharedElementNavigationManager
 import com.melabsinthiatum.sharedElementsBrowser.toolWindow.tree.*
 import kotlinx.coroutines.*
+import java.awt.BorderLayout
+import javax.swing.Box
 import javax.swing.JPanel
-import javax.swing.SwingUtilities
 import javax.swing.tree.*
 
 /**
@@ -59,20 +58,18 @@ import javax.swing.tree.*
  *
  * Also, the browser can perform updates by a predefined in the settings time interval.
  *
- * The tree updates only if the tool window is visible and any editor is focused.
+ * The tree updates only if the tool window is visible.
  */
-class SharedElementsBrowser(private val project: Project, private val toolWindow: ToolWindow) : Loggable {
-
-    var content: JPanel
+class SharedElementsBrowser(private val project: Project, private val toolWindow: ToolWindow) : JPanel(), Loggable {
 
     private val logger = logger()
-    private val sharedElementsTree: Tree
     private var treeRoot: DefaultMutableTreeNode = DefaultMutableTreeNode(RootNodeModel(project.name))
-    private val treeModel: DefaultTreeModel
+    private val treeModel: DefaultTreeModel = DefaultTreeModel(treeRoot)
+    private val sharedElementsTree: Tree = Tree(treeModel)
     private val updateManager = SharedElementsUpdateManager
     private val diffManager = TreeDiffManager
     private var updateJob: Job? = null
-    private var reloadInterval: Long
+    private var reloadInterval: Long = 0
     private var msgBus = project.messageBus.connect(project)
     private val elementsSelectionHandler = SharedElementsTreeSelectionHandler(SharedElementNavigationManager(project))
 
@@ -80,43 +77,37 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
     private fun log(msg: String) = println("[${Thread.currentThread().name}] $msg")
 
     init {
+        createPanel()
+        launchFlows()
+
         logger.info("Tool window is created.")
-
-        treeModel = DefaultTreeModel(treeRoot)
-
-        sharedElementsTree = Tree(treeModel)
-        configureSharedElementsTree()
-        val decorator = decorator(sharedElementsTree)
-        val panel = decorator.createPanel()
-        content = panel
-
-        subscribe(msgBus)
-
-        val service = ServiceManager.getService(TreeSettingsComponent::class.java)
-        reloadInterval = service?.state?.reloadInterval ?: 10
-
-        val myBus = ApplicationManager.getApplication().messageBus
-        val publisher: SharedElementsTreeSettingsNotifier =
-            myBus.syncPublisher(SharedElementsTopics.SHARED_ELEMENTS_TREE_SETTINGS_TOPIC)
-        publisher.reloadIntervalUpdated(reloadInterval, reloadInterval)
     }
+
 
     //
     //  Initial configuration
     //
 
-    private fun decorator(tree: Tree): ToolbarDecorator {
-        val refreshActionButton = AnActionButton.fromAction(RefreshTreeAction())
-        refreshActionButton.templatePresentation.icon = CustomIcons.Actions.Refresh
+    private fun createPanel() {
+        super.setLayout(BorderLayout())
 
-        val treeSettingsButton = AnActionButton.fromAction(TreeSettingsAction())
-        treeSettingsButton.templatePresentation.icon = CustomIcons.Actions.Settings
+        val mainActionGroup =
+            ActionManager.getInstance().getAction("SharedElementsBrowserActions") as ActionGroup
+        val toolbar =
+            ActionManager.getInstance().createActionToolbar(
+                "Expect-Actual Interface", mainActionGroup, true
+            )
+        val toolBarBox = Box.createHorizontalBox()
+        toolBarBox.add(toolbar.component)
 
-        return ToolbarDecorator.createDecorator(tree)
-            .initPosition()
-            .disableAddAction().disableRemoveAction().disableDownAction().disableUpAction()
-            .addExtraActions(refreshActionButton)
-            .addExtraAction(treeSettingsButton)
+        configureSharedElementsTree()
+        val treePanel = JPanel(BorderLayout())
+        treePanel.add(JBScrollPane(sharedElementsTree), BorderLayout.CENTER)
+
+        border = JBUI.Borders.empty(-1)
+        add(toolBarBox, BorderLayout.NORTH)
+        add(treePanel, BorderLayout.CENTER)
+        toolbar.component.isVisible = true
     }
 
     private fun configureSharedElementsTree() {
@@ -127,6 +118,23 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
             addKeyListener(SharedElementsTreeKeyListener(this, elementsSelectionHandler))
             addMouseListener(SharedElementsTreeMouseListener(this, elementsSelectionHandler))
         }
+    }
+
+
+    //
+    //  Initial flows
+    //
+
+    private fun launchFlows() {
+        subscribe(msgBus)
+
+        val service = ServiceManager.getService(TreeSettingsComponent::class.java)
+        service?.state?.reloadInterval?.let { reloadInterval = it }
+
+        val myBus = ApplicationManager.getApplication().messageBus
+        val publisher: SharedElementsTreeSettingsNotifier =
+            myBus.syncPublisher(SharedElementsTopics.SHARED_ELEMENTS_TREE_SETTINGS_TOPIC)
+        publisher.reloadIntervalUpdated(reloadInterval, reloadInterval)
     }
 
     private fun subscribe(bus: MessageBusConnection) {
@@ -177,15 +185,7 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
 //                NotificationType.INFORMATION
 //            )
 //        )
-
-        val isAnyFocusedEditor = FileEditorManager.getInstance(project).selectedEditors.any { editor ->
-            val window = SwingUtilities.getWindowAncestor(editor.component)
-            window != null && window.isFocused
-        }
-
-        val isToolWindowVisible = toolWindow.isVisible
-
-        if (isAnyFocusedEditor && isToolWindowVisible) {
+        if (toolWindow.isVisible) {
             updateManager.update(project)
         }
     }
@@ -231,21 +231,19 @@ class SharedElementsBrowser(private val project: Project, private val toolWindow
         treeModel.reload()
         sharedElementsTree.expand(expanded)
     }
-
-    private fun startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long = 0, action: () -> Unit) =
-        GlobalScope.launch {
-            delay(delayMillis)
-            if (repeatMillis > 0) {
-                while (isActive) {
-                    launch(Dispatchers.Main) {
-                        action()
-                    }
-                    delay(repeatMillis)
-                }
-            } else {
-                action()
-            }
-        }
 }
 
-
+private fun startCoroutineTimer(delayMillis: Long = 0, repeatMillis: Long = 0, action: () -> Unit) =
+    GlobalScope.launch {
+        delay(delayMillis)
+        if (repeatMillis > 0) {
+            while (isActive) {
+                launch(Dispatchers.Main) {
+                    action()
+                }
+                delay(repeatMillis)
+            }
+        } else {
+            action()
+        }
+    }

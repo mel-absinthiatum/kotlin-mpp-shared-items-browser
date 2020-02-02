@@ -42,4 +42,22 @@
 
         <postStartupActivity implementation="com.melabsinthiatum.services.extensionPoints.CustomStartupActivity"/>
     </extensions>
+    <actions>
+        <group id="SharedElementsBrowserActions" text="Browser Actions" popup="true">
+            <action id="com.melabsinthiatum.actions.RefreshTreeActio"
+                    class="com.melabsinthiatum.actions.RefreshTreeAction"
+                    text="Refresh"
+                    description="Refresh shared elements tree"
+                    icon="/actions/refresh.png"
+            />
+            <separator/>
+            <action id="com.melabsinthiatum.actions.TreeSettingsAction"
+                    class="com.melabsinthiatum.actions.TreeSettingsAction"
+                    text="Settings"
+                    description="Open settings"
+                    icon="/general/settings.png"
+            />
+        </group>
+
+    </actions>
 </idea-plugin>
